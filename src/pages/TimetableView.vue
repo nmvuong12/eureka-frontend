@@ -1,7 +1,7 @@
 <template>
   <div class="h-full flex flex-col">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Thời khóa biểu</h1>
+      <h1 class="text-3xl font-bold text-gray-900">{{ $t('timetable.title') }}</h1>
       
       <div class="flex space-x-2">
         <button v-if="authStore.isAdmin || !authStore.isTeacher" @click="runSolver" :disabled="solving" class="btn-primary flex items-center">
@@ -9,7 +9,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          {{ solving ? 'Đang xếp lịch...' : 'Tự động xếp lịch' }}
+          {{ solving ? $t('timetable.solver_running') : $t('timetable.solver_run') }}
         </button>
       </div>
     </div>
@@ -17,21 +17,21 @@
     <!-- Filters -->
     <div class="card mb-6 flex flex-wrap gap-4 items-end">
       <div v-if="authStore.isAdmin || !authStore.isTeacher" class="w-64">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Giáo viên</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('menu.teachers') }}</label>
         <select v-model="filters.teacherId" @change="fetchTimetable" class="input-field">
-          <option :value="null">Tất cả giáo viên</option>
+          <option :value="null">{{ $t('timetable.all_teachers') }}</option>
           <option v-for="t in teachers" :key="t.id" :value="t.id">{{ t.name }}</option>
         </select>
       </div>
       <div v-if="authStore.isAdmin || !authStore.isTeacher" class="w-64">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Lớp học</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('class.title') }}</label>
         <select v-model="filters.classId" @change="fetchTimetable" class="input-field">
-          <option :value="null">Tất cả lớp học</option>
+          <option :value="null">{{ $t('timetable.all_classes') }}</option>
           <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
       <div>
-        <button @click="fetchTimetable" class="btn-secondary">Làm mới</button>
+        <button @click="fetchTimetable" class="btn-secondary">{{ $t('common.reset') }}</button>
       </div>
     </div>
 
@@ -39,7 +39,7 @@
     <div class="card flex-1 overflow-auto bg-gray-50 p-0">
       <div class="min-w-[1000px] grid grid-cols-8 gap-px bg-gray-200">
         <!-- Headers -->
-        <div class="bg-gray-100 p-3 text-center font-bold text-gray-700 border-b">Ca học</div>
+        <div class="bg-gray-100 p-3 text-center font-bold text-gray-700 border-b">{{ $t('timetable.ca') }}</div>
         <div v-for="day in daysOfWeek" :key="day" class="bg-gray-100 p-3 text-center font-bold text-gray-700 border-b">
           {{ formatDay(day) }}
         </div>
@@ -55,12 +55,12 @@
                   @click="openLessonDetails(lesson)">
                <div class="font-bold text-primary-800">{{ lesson.className }}</div>
                <div class="text-gray-700 flex justify-between mt-1">
-                 <span>Giáo viên:</span> 
-                 <span class="font-medium text-right">{{ lesson.teacherName || 'Chưa xếp' }}</span>
+                 <span>{{ $t('menu.teachers') }}:</span> 
+                 <span class="font-medium text-right">{{ lesson.teacherName || $t('common.no_data') }}</span>
                </div>
                <div class="text-gray-700 flex justify-between">
-                 <span>Phòng:</span> 
-                 <span class="font-medium text-right">{{ lesson.roomName || 'Chưa xếp' }}</span>
+                 <span>{{ $t('room.title') }}:</span> 
+                 <span class="font-medium text-right">{{ lesson.roomName || $t('common.no_data') }}</span>
                </div>
              </div>
           </div>
@@ -75,6 +75,9 @@ import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import type { TimetableEntry, Teacher, SchoolClass } from '@/types';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const authStore = useAuthStore();
 const timetable = ref<TimetableEntry[]>([]);
@@ -95,8 +98,8 @@ const timeGroups = ['Ca 1 (07:30 - 09:00)', 'Ca 2 (09:15 - 10:45)', 'Ca 3 (13:30
 
 const formatDay = (day: string) => {
   const map: Record<string, string> = {
-    MONDAY: 'Thứ 2', TUESDAY: 'Thứ 3', WEDNESDAY: 'Thứ 4',
-    THURSDAY: 'Thứ 5', FRIDAY: 'Thứ 6', SATURDAY: 'Thứ 7', SUNDAY: 'Chủ nhật'
+    MONDAY: t('timetable.mon'), TUESDAY: t('timetable.tue'), WEDNESDAY: t('timetable.wed'),
+    THURSDAY: t('timetable.thu'), FRIDAY: t('timetable.fri'), SATURDAY: t('timetable.sat'), SUNDAY: t('timetable.sun')
   };
   return map[day];
 };
@@ -138,7 +141,7 @@ const runSolver = async () => {
     }
   } catch (err) {
     solving.value = false;
-    alert('Không thể bắt đầu xếp lịch');
+    alert(t('common.error'));
   }
 };
 
@@ -152,11 +155,11 @@ const pollStatus = (jobId: string) => {
           clearInterval(pollInterval.value);
           solving.value = false;
           fetchTimetable();
-          alert(`Xếp lịch hoàn tất! Score: ${status.split(':')[1]}`);
+          alert(`${t('timetable.solver_success')} Score: ${status.split(':')[1]}`);
         } else if (status.startsWith('ERROR')) {
           clearInterval(pollInterval.value);
           solving.value = false;
-          alert('Lỗi khi xếp lịch: ' + status);
+          alert(`${t('timetable.solver_error')}: ` + status);
         }
       }
     } catch (err) {
@@ -168,7 +171,7 @@ const pollStatus = (jobId: string) => {
 
 const openLessonDetails = (lesson: TimetableEntry) => {
   // Demo function for click event
-  alert(`Chi tiết buổi học:\nLớp: ${lesson.className}\nGiáo viên: ${lesson.teacherName}\nPhòng: ${lesson.roomName}`);
+  alert(`${t('timetable.lesson_detail')}:\n${t('class.name')}: ${lesson.className}\n${t('menu.teachers')}: ${lesson.teacherName}\n${t('room.title')}: ${lesson.roomName}`);
 };
 
 onMounted(() => {

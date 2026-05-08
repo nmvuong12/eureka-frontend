@@ -1,44 +1,51 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Đăng nhập hệ thống
+  <div class="min-h-screen flex items-center justify-center bg-green-gradient py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none"></div>
+    <el-card class="max-w-md w-full !border-0 shadow-2xl rounded-2xl p-8 bg-white/95 backdrop-blur-sm z-10">
+      <div class="text-center mb-8">
+        <h2 class="mt-2 text-3xl font-extrabold text-gray-900">
+          {{ $t('login.title') }}
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Trung tâm Anh ngữ Eureka
+        <p class="mt-2 text-sm text-gray-600">
+          {{ $t('login.center_name') }}
         </p>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div class="mb-4">
-            <label for="username" class="sr-only">Tên đăng nhập</label>
-            <input id="username" v-model="form.username" name="username" type="text" required class="input-field" placeholder="Tên đăng nhập" />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Mật khẩu</label>
-            <input id="password" v-model="form.password" name="password" type="password" required class="input-field" placeholder="Mật khẩu" />
-          </div>
-        </div>
 
-        <div v-if="errorMsg" class="text-red-500 text-sm text-center">
+      <el-form :model="form" @keyup.enter="handleSubmit" size="large">
+        <el-form-item>
+          <el-input 
+            v-model="form.username" 
+            :placeholder="$t('login.username')" 
+            :prefix-icon="User"
+          />
+        </el-form-item>
+        <el-form-item class="mb-6">
+          <el-input 
+            v-model="form.password" 
+            type="password" 
+            :placeholder="$t('login.password')" 
+            show-password
+            :prefix-icon="Lock"
+          />
+        </el-form-item>
+
+        <div v-if="errorMsg" class="text-red-500 text-sm text-center mb-4">
           {{ errorMsg }}
         </div>
 
-        <div>
-          <button type="submit" class="w-full btn-primary" :disabled="loading">
-            <span v-if="loading">Đang xử lý...</span>
-            <span v-else>Đăng nhập</span>
-          </button>
-        </div>
-      </form>
+        <el-form-item>
+          <el-button type="primary" class="w-full" :loading="loading" @click="handleSubmit">
+            {{ $t('login.btn') }}
+          </el-button>
+        </el-form-item>
+      </el-form>
       
-      <div class="mt-4 text-xs text-gray-500 text-center">
-        Tài khoản mẫu:<br/>
-        Admin: admin / Admin@123<br/>
-        Giáo viên: mai.nguyen / Teacher@123
+      <div class="mt-6 text-xs text-gray-500 text-center border-t border-gray-100 pt-4">
+        {{ $t('login.sample_accounts') }}<br/>
+        Admin: <span class="font-semibold text-gray-700">admin</span> / <span class="font-semibold text-gray-700">Admin@123</span><br/>
+        {{ $t('account.teacher_role') }}: <span class="font-semibold text-gray-700">mai.nguyen</span> / <span class="font-semibold text-gray-700">Teacher@123</span>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
@@ -46,6 +53,10 @@
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+import { User, Lock } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -55,6 +66,11 @@ const errorMsg = ref('');
 const loading = ref(false);
 
 const handleSubmit = async () => {
+  if (!form.value.username || !form.value.password) {
+    errorMsg.value = t('login.error_required');
+    return;
+  }
+  
   loading.value = true;
   errorMsg.value = '';
   try {
@@ -62,10 +78,10 @@ const handleSubmit = async () => {
     if (res.success) {
       router.push('/');
     } else {
-      errorMsg.value = res.message || 'Đăng nhập thất bại';
+      errorMsg.value = res.message || t('login.error_failed');
     }
   } catch (error: any) {
-    errorMsg.value = error.message || 'Lỗi kết nối server';
+    errorMsg.value = error.message || t('login.error_server');
   } finally {
     loading.value = false;
   }

@@ -2,17 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Element Plus Theme Overrides */
+  --el-color-primary: #059669;
+  --el-color-primary-light-3: #34d399;
+  --el-color-primary-light-5: #6ee7b7;
+  --el-color-primary-light-7: #a7f3d0;
+  --el-color-primary-light-8: #d1fae5;
+  --el-color-primary-light-9: #ecfdf5;
+  --el-color-primary-dark-2: #047857;
+  
+  --primary-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #047857 0%, #059669 100%);
+}
+
+@layer base {
+  body {
+    @apply text-gray-800 bg-gray-50;
+  }
+}
+
 @layer components {
+  /* Premium Buttons */
   .btn-primary {
-    @apply px-4 py-2 bg-primary-600 text-white rounded shadow hover:bg-primary-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply px-5 py-2.5 text-white font-medium rounded-lg shadow-md transition-all duration-300 transform active:scale-95 flex items-center justify-center;
+    background: var(--primary-gradient);
+    border: none;
   }
+  
+  .btn-primary:hover {
+    background: var(--primary-gradient-hover);
+    @apply shadow-lg -translate-y-0.5;
+  }
+
   .btn-secondary {
-    @apply px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply px-5 py-2.5 bg-white text-emerald-700 border border-emerald-100 font-medium rounded-lg shadow-sm transition-all duration-300 hover:bg-emerald-50 hover:border-emerald-200 active:scale-95;
   }
+
   .input-field {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border;
+    @apply block w-full rounded-lg border-gray-200 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm px-4 py-2.5 transition-all duration-200;
   }
+
   .card {
-    @apply bg-white shadow rounded-lg p-6;
+    @apply bg-white shadow-xl shadow-emerald-900/5 rounded-2xl p-8 border border-emerald-50/50;
+  }
+
+  /* Element Plus Button Customization */
+  .el-button--primary {
+    background: var(--primary-gradient) !important;
+    border: none !important;
+    color: white !important;
+    @apply shadow-md transition-all duration-300 !important;
+  }
+
+  .el-button--primary:hover, .el-button--primary:focus {
+    background: var(--primary-gradient-hover) !important;
+    color: white !important;
+    @apply shadow-lg -translate-y-0.5 !important;
+  }
+
+  .el-button--primary.is-link, .el-button--primary.is-text {
+    background: transparent !important;
+    color: var(--el-color-primary) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+  
+  .el-button--primary.is-link:hover, .el-button--primary.is-text:hover {
+    background: var(--el-color-primary-light-9) !important;
+    color: var(--el-color-primary-dark-2) !important;
+  }
+
+  /* Drawer/Modal Styling */
+  .el-drawer__header {
+    @apply mb-0 pb-4 border-b border-gray-100 font-bold !important;
+    background: linear-gradient(to right, #f0fdf4, transparent);
+  }
+
+  .el-drawer__title {
+    @apply text-emerald-900 text-xl !important;
+  }
+
+  /* Menu Styling */
+  .el-menu {
+    @apply border-none !important;
+  }
+
+  .el-menu-item.is-active {
+    background-color: var(--el-color-primary-light-9) !important;
+    color: var(--el-color-primary) !important;
+    @apply border-r-4 border-emerald-600 font-bold !important;
+  }
+
+  .el-menu-item:hover {
+    color: var(--el-color-primary) !important;
+    background-color: var(--el-color-primary-light-9) !important;
+  }
+
+  .el-menu-item .el-icon {
+    @apply transition-colors duration-200;
+  }
+
+  .el-menu-item.is-active .el-icon {
+    color: var(--el-color-primary) !important;
+  }
+
+  /* Dropdown Overrides */
+  .el-dropdown-menu__item:not(.is-disabled):focus,
+  .el-dropdown-menu__item:not(.is-disabled):hover {
+    background-color: var(--el-color-primary-light-9) !important;
+    color: var(--el-color-primary) !important;
+  }
+
+  /* Breadcrumb Overrides */
+  .el-breadcrumb__inner.is-link:hover {
+    color: var(--el-color-primary) !important;
+  }
+
+  /* General Hover Colors */
+  .hover-primary:hover {
+    color: var(--el-color-primary) !important;
+  }
+
+  /* Links */
+  a:hover {
+    color: var(--el-color-primary);
+  }
+
+  /* Pagination */
+  .el-pagination.is-background .el-pager li.is-active {
+    background-color: var(--el-color-primary) !important;
+  }
+
+  .el-pagination.is-background .el-pager li:not(.is-active):hover {
+    color: var(--el-color-primary) !important;
+  }
+
+  /* Tabs */
+  .el-tabs__item.is-active {
+    color: var(--el-color-primary) !important;
+  }
+  .el-tabs__item:hover {
+    color: var(--el-color-primary) !important;
+  }
+  .el-tabs__active-bar {
+    background-color: var(--el-color-primary) !important;
   }
 }

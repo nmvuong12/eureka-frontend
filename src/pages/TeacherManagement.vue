@@ -1,113 +1,213 @@
 <template>
-  <div>
+  <div class="teacher-management">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Quản lý Giáo viên</h1>
-      <button @click="openModal()" class="btn-primary">Thêm Giáo viên</button>
+      <h1 class="text-3xl font-bold text-gray-900">{{ $t('teacher.title') }}</h1>
+      <el-button type="primary" @click="openModal()">
+        <el-icon class="mr-1"><Plus /></el-icon>
+        {{ $t('common.add') }} {{ $t('menu.teachers') }}
+      </el-button>
     </div>
 
-    <div class="card overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Họ tên</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Liên hệ</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kỹ năng</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="teacher in teachers" :key="teacher.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="font-medium text-gray-900">{{ teacher.name }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ teacher.email }}</div>
-              <div class="text-sm text-gray-500">{{ teacher.phone }}</div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex flex-wrap gap-1">
-                <span v-for="skill in teacher.skills" :key="skill" class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                  {{ skill }}
-                </span>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                    :class="teacher.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                {{ teacher.status === 'ACTIVE' ? 'Hoạt động' : 'Đã nghỉ' }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button @click="openModal(teacher)" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</button>
-              <button @click="deleteTeacher(teacher.id!)" class="text-red-600 hover:text-red-900">Xóa</button>
-            </td>
-          </tr>
-          <tr v-if="teachers.length === 0">
-            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Không có dữ liệu</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Advanced Search Area -->
+    <el-card class="mb-6" shadow="sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-medium text-gray-800 flex items-center gap-2">
+          <el-icon><Search /></el-icon>
+          {{ $t('common.search') }}
+        </h2>
+        <el-button link type="primary" @click="resetSearch">{{ $t('common.reset') }}</el-button>
+      </div>
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('teacher.name') }}</div>
+          <el-input v-model="searchFilters.name" :placeholder="$t('common.placeholder_input')" clearable />
+        </el-col>
+        <el-col :span="6">
+          <div class="mb-2 text-sm font-medium text-gray-700">Email / SĐT</div>
+          <el-input v-model="searchFilters.contact" placeholder="Nhập email hoặc SĐT..." clearable />
+        </el-col>
+        <el-col :span="6">
+          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('teacher.skills') }}</div>
+          <el-input v-model="searchFilters.skill" placeholder="VD: IELTS" clearable />
+        </el-col>
+        <el-col :span="6">
+          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('common.status') }}</div>
+          <el-select v-model="searchFilters.status" :placeholder="$t('common.placeholder_select')" clearable class="w-full">
+            <el-option :label="$t('common.active')" value="ACTIVE" />
+            <el-option :label="$t('common.inactive')" value="INACTIVE" />
+          </el-select>
+        </el-col>
+      </el-row>
+    </el-card>
+
+    <el-card shadow="sm" class="mb-6" :body-style="{ padding: '0px' }">
+      <el-table :data="teachers" style="width: 100%" stripe>
+        <el-table-column prop="name" :label="$t('teacher.name')" min-width="180">
+          <template #default="{ row }">
+            <div class="font-medium text-gray-900">{{ row.name }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.details')" min-width="200">
+          <template #default="{ row }">
+            <div class="text-sm text-gray-500">{{ row.email }}</div>
+            <div class="text-sm text-gray-500">{{ row.phone }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('teacher.skills')" min-width="220">
+          <template #default="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <el-tag v-for="skill in row.skills" :key="skill" size="small" effect="plain" type="info">
+                {{ skill }}
+              </el-tag>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.status')" min-width="120">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'danger'">
+              {{ row.status === 'ACTIVE' ? $t('common.active') : $t('common.inactive') }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.actions')" width="100" fixed="right">
+          <template #default="{ row }">
+            <el-button type="info" link @click="openModal(row, true)">
+              <el-icon><View /></el-icon>
+            </el-button>
+            <el-button type="danger" link @click="deleteTeacher(row.id!)">
+              <el-icon><Delete /></el-icon>
+            </el-button>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty description="Không tìm thấy dữ liệu phù hợp" />
+        </template>
+      </el-table>
+
+      <div class="flex justify-end p-4 border-t border-gray-100">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="itemsPerPage"
+          :page-sizes="[15, 30, 50]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalElements"
+        />
+      </div>
+    </el-card>
 
     <!-- Drawer Form -->
-    <Drawer :is-open="showModal" :title="currentTeacher.id ? 'Sửa Giáo viên' : 'Thêm Giáo viên mới'" @close="closeModal">
-      <form @submit.prevent="saveTeacher" id="teacherForm">
-        <div class="space-y-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Họ tên *</label>
-            <input v-model="currentTeacher.name" type="text" required class="input-field mt-1" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Email *</label>
-            <input v-model="currentTeacher.email" type="email" required class="input-field mt-1" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
-            <input v-model="currentTeacher.phone" type="text" class="input-field mt-1" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Kỹ năng (Căn cứ bằng dấu phẩy)</label>
-            <input v-model="skillString" type="text" class="input-field mt-1" placeholder="IELTS, TOEIC, GIAO_TIEP" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Trạng thái</label>
-            <select v-model="currentTeacher.status" class="input-field mt-1">
-              <option value="ACTIVE">Hoạt động</option>
-              <option value="INACTIVE">Đã nghỉ</option>
-            </select>
-          </div>
-        </div>
-      </form>
+    <el-drawer
+      v-model="showModal"
+      :title="isViewOnly ? $t('teacher.view_detail') : (currentTeacher.id ? $t('teacher.update') : $t('teacher.create'))"
+      size="50%"
+      @close="closeModal"
+    >
+      <el-form :model="currentTeacher" label-position="top" :disabled="isViewOnly">
+        <el-form-item :label="$t('teacher.name')" required>
+          <el-input v-model="currentTeacher.name" />
+        </el-form-item>
+        <el-form-item :label="$t('teacher.email')" required>
+          <el-input v-model="currentTeacher.email" type="email" />
+        </el-form-item>
+        <el-form-item :label="$t('teacher.phone')">
+          <el-input v-model="currentTeacher.phone" />
+        </el-form-item>
+        <el-form-item :label="$t('teacher.skills_help')">
+          <el-input v-model="skillString" :placeholder="$t('teacher.skills_placeholder')" />
+        </el-form-item>
+        <el-form-item :label="$t('common.status')">
+          <el-select v-model="currentTeacher.status" class="w-full">
+            <el-option :label="$t('common.active')" value="ACTIVE" />
+            <el-option :label="$t('common.inactive')" value="INACTIVE" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      
       <template #footer>
-        <button type="button" @click="closeModal" class="btn-secondary">Hủy</button>
-        <button type="submit" form="teacherForm" class="btn-primary">Lưu thay đổi</button>
+        <div class="flex justify-end space-x-2">
+          <template v-if="isViewOnly">
+            <el-button type="primary" @click="isViewOnly = false">
+              <el-icon class="mr-1"><Edit /></el-icon>
+              {{ $t('common.edit') }}
+            </el-button>
+          </template>
+          <template v-else>
+            <el-button @click="closeModal">{{ $t('common.cancel') }}</el-button>
+            <el-button type="primary" @click="saveTeacher">{{ $t('common.save') }}</el-button>
+          </template>
+        </div>
       </template>
-    </Drawer>
+    </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import api from '@/api/axios';
 import type { Teacher } from '@/types';
-import Drawer from '@/components/Drawer.vue';
+import { Plus, Search, Edit, Delete, View } from '@element-plus/icons-vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const teachers = ref<Teacher[]>([]);
+
+// Pagination and Search State
+const currentPage = ref(1);
+const itemsPerPage = ref(15);
+const totalElements = ref(0);
+const searchFilters = ref({
+  name: '',
+  contact: '',
+  skill: '',
+  status: ''
+});
+
 const showModal = ref(false);
+const isViewOnly = ref(false);
 const currentTeacher = ref<Teacher>({ name: '', email: '', phone: '', status: 'ACTIVE', skills: [] });
 const skillString = ref('');
 
+const resetSearch = () => {
+  searchFilters.value = { name: '', contact: '', skill: '', status: '' };
+  currentPage.value = 1;
+};
+
 const fetchTeachers = async () => {
   try {
-    const res: any = await api.get('/teachers');
-    if (res.success) teachers.value = res.data;
+    const params = {
+      page: currentPage.value,
+      size: itemsPerPage.value,
+      name: searchFilters.value.name || undefined,
+      contact: searchFilters.value.contact || undefined,
+      skill: searchFilters.value.skill || undefined,
+      status: searchFilters.value.status || undefined
+    };
+    
+    const res: any = await api.get('/teachers', { params });
+    if (res.success) {
+      teachers.value = res.data.content;
+      totalElements.value = res.data.totalElements;
+    }
   } catch (err) {
-    alert('Lỗi tải danh sách giáo viên');
+    ElMessage.error(t('teacher.error_load'));
   }
 };
 
-const openModal = (teacher?: Teacher) => {
+watch([currentPage, itemsPerPage], () => {
+  fetchTeachers();
+});
+
+let timeoutId: any;
+watch(searchFilters, () => {
+  currentPage.value = 1;
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => fetchTeachers(), 500);
+}, { deep: true });
+
+const openModal = (teacher?: Teacher, viewOnly: boolean = false) => {
+  isViewOnly.value = viewOnly;
   if (teacher) {
     currentTeacher.value = { ...teacher };
     skillString.value = teacher.skills ? teacher.skills.join(', ') : '';
@@ -137,24 +237,31 @@ const saveTeacher = async () => {
     }
     
     if (res.success) {
+      ElMessage.success(t('common.success'));
       closeModal();
       fetchTeachers();
     } else {
-      alert(res.message);
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err: any) {
-    alert(err.message || 'Lỗi lưu thông tin');
+    ElMessage.error(err.message || t('common.error'));
   }
 };
 
 const deleteTeacher = async (id: number) => {
-  if (confirm('Bạn có chắc chắn muốn xóa giáo viên này?')) {
-    try {
-      const res: any = await api.delete(`/teachers/${id}`);
-      if (res.success) fetchTeachers();
-    } catch (err) {
-      alert('Lỗi xóa giáo viên');
+  try {
+    await ElMessageBox.confirm(t('teacher.delete_confirm'), t('common.confirm'), {
+      confirmButtonText: t('common.delete'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning',
+    });
+    const res: any = await api.delete(`/teachers/${id}`);
+    if (res.success) {
+      ElMessage.success(t('common.success'));
+      fetchTeachers();
     }
+  } catch (err) {
+    // Canceled
   }
 };
 
