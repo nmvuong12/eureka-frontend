@@ -39,12 +39,6 @@
           </el-button>
         </el-form-item>
       </el-form>
-      
-      <div class="mt-6 text-xs text-gray-500 text-center border-t border-gray-100 pt-4">
-        {{ $t('login.sample_accounts') }}<br/>
-        Admin: <span class="font-semibold text-gray-700">admin</span> / <span class="font-semibold text-gray-700">Admin@123</span><br/>
-        {{ $t('account.teacher_role') }}: <span class="font-semibold text-gray-700">mai.nguyen</span> / <span class="font-semibold text-gray-700">Teacher@123</span>
-      </div>
     </el-card>
   </div>
 </template>

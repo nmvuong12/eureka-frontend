@@ -1,37 +1,54 @@
 <template>
-  <div class="account-management">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">{{ $t('account.title') }}</h1>
-      <el-button type="primary" @click="openModal()">
+  <div class="account-management space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100 mb-6">
+      <div>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
+          <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
+          {{ $t('account.title') }}
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản người dùng, phân quyền truy cập hệ thống và thông tin chi tiết.</p>
+      </div>
+      <el-button type="primary" @click="openModal()" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300">
         <el-icon class="mr-1"><Plus /></el-icon>
         {{ $t('common.add') }} {{ $t('menu.accounts') }}
       </el-button>
     </div>
 
     <!-- Advanced Search Area -->
-    <el-card class="mb-6" shadow="sm">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-medium text-gray-800 flex items-center gap-2">
-          <el-icon><Search /></el-icon>
-          {{ $t('common.search') }}
+    <el-card class="border border-gray-100 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md mb-6" :body-style="{ padding: '24px' }">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <el-icon class="text-emerald-500"><Search /></el-icon>
+          Bộ lọc nâng cao
         </h2>
-        <el-button link type="primary" @click="resetSearch">{{ $t('common.reset') }}</el-button>
+        <div class="flex items-center gap-2">
+          <el-button type="primary" @click="handleSearch" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
+            <el-icon class="mr-1"><Search /></el-icon>
+            {{ $t('common.search') }}
+          </el-button>
+          <el-button @click="resetSearch" class="hover:text-emerald-600 hover:border-emerald-200">
+            <el-icon class="mr-1"><Refresh /></el-icon>
+            {{ $t('common.reset') }}
+          </el-button>
+        </div>
       </div>
-      <el-row :gutter="20" class="mb-4">
-        <el-col :span="8">
-          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('account.username') }}</div>
-          <el-input v-model="searchFilters.username" :placeholder="$t('common.placeholder_input')" clearable />
+      
+      <el-row :gutter="20" class="row-gap-4">
+        <el-col :xs="24" :sm="12" :md="8" class="mb-4">
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('account.username') }}</div>
+          <el-input v-model="searchFilters.username" :placeholder="$t('common.placeholder_input')" clearable @keyup.enter="handleSearch" />
         </el-col>
-        <el-col :span="8">
-          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('account.role') }}</div>
+        <el-col :xs="24" :sm="12" :md="8" class="mb-4">
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('account.role') }}</div>
           <el-select v-model="searchFilters.role" :placeholder="$t('common.placeholder_select')" clearable class="w-full">
             <el-option :label="$t('account.admin')" value="ADMIN" />
             <el-option :label="$t('account.staff')" value="STAFF" />
             <el-option :label="$t('account.teacher_role')" value="TEACHER" />
           </el-select>
         </el-col>
-        <el-col :span="8">
-          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('common.status') }}</div>
+        <el-col :xs="24" :sm="12" :md="8" class="mb-4">
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.status') }}</div>
           <el-select v-model="searchFilters.isActive" :placeholder="$t('common.placeholder_select')" clearable class="w-full">
             <el-option :label="$t('common.active')" value="true" />
             <el-option :label="$t('common.inactive')" value="false" />
@@ -39,57 +56,70 @@
         </el-col>
       </el-row>
       <el-row :gutter="20">
-        <el-col :span="12">
-          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('account.full_name') }}</div>
-          <el-input v-model="searchFilters.fullName" :placeholder="$t('common.placeholder_input')" clearable />
+        <el-col :xs="24" :sm="12" :md="12" class="mb-4">
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('account.full_name') }}</div>
+          <el-input v-model="searchFilters.fullName" :placeholder="$t('common.placeholder_input')" clearable @keyup.enter="handleSearch" />
         </el-col>
-        <el-col :span="12">
-          <div class="mb-2 text-sm font-medium text-gray-700">{{ $t('account.email') }}</div>
-          <el-input v-model="searchFilters.email" :placeholder="$t('common.placeholder_input')" clearable />
+        <el-col :xs="24" :sm="12" :md="12" class="mb-4">
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('account.email') }}</div>
+          <el-input v-model="searchFilters.email" :placeholder="$t('common.placeholder_input')" clearable @keyup.enter="handleSearch" />
         </el-col>
       </el-row>
     </el-card>
 
-    <el-card shadow="sm" class="mb-6" :body-style="{ padding: '0px' }">
-      <el-table :data="users" style="width: 100%" stripe>
-        <el-table-column prop="username" :label="$t('account.username')" min-width="140" />
+    <!-- Data Table Card -->
+    <el-card shadow="sm" class="border border-gray-100 rounded-2xl overflow-hidden mb-6" :body-style="{ padding: '0px' }">
+      <el-table :data="users" style="width: 100%" stripe class="premium-table">
+        <el-table-column prop="username" :label="$t('account.username')" min-width="140">
+          <template #default="{ row }">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+              {{ row.username }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="role" :label="$t('account.role')" min-width="130">
           <template #default="{ row }">
-            <el-tag :type="row.role === 'ADMIN' ? 'warning' : row.role === 'STAFF' ? 'info' : 'success'">
+            <el-tag :type="row.role === 'ADMIN' ? 'warning' : row.role === 'STAFF' ? 'info' : 'success'" effect="light" class="font-bold rounded-lg">
               {{ row.role === 'ADMIN' ? $t('account.admin') : row.role === 'STAFF' ? $t('account.staff') : $t('account.teacher_role') }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('account.full_name')" min-width="160">
           <template #default="{ row }">
-            <span class="font-medium text-gray-800">{{ row.fullName || '-' }}</span>
+            <span class="font-bold text-gray-900 hover:text-emerald-600 transition-colors duration-200">{{ row.fullName || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('account.dob')" min-width="130">
           <template #default="{ row }">
-            <span class="text-gray-600">{{ row.dob ? formatDate(row.dob) : '-' }}</span>
+            <span class="text-gray-600 font-medium">{{ row.dob ? formatDate(row.dob) : '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('account.email')" min-width="200">
           <template #default="{ row }">
-            <span class="text-gray-600">{{ row.email || '-' }}</span>
+            <span class="text-gray-600 font-medium">{{ row.email || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status')" min-width="120">
           <template #default="{ row }">
-            <el-tag :type="row.isActive ? 'success' : 'danger'" effect="dark">
+            <el-tag :type="row.isActive ? 'success' : 'danger'" effect="dark" class="font-bold rounded-md">
               {{ row.isActive ? $t('common.active') : $t('common.inactive') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="100" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
-            <el-button type="info" link @click="openModal(row, true)">
-              <el-icon><View /></el-icon>
-            </el-button>
-            <el-button type="danger" link @click="deleteUser(row.id)">
-              <el-icon><Delete /></el-icon>
-            </el-button>
+            <div class="flex items-center gap-1">
+              <el-tooltip content="Xem chi tiết" placement="top">
+                <el-button type="info" link @click="openModal(row, true)" class="hover:!text-blue-600">
+                  <el-icon :size="16"><View /></el-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="Xóa tài khoản" placement="top">
+                <el-button type="danger" link @click="deleteUser(row.id)" class="hover:!text-red-600">
+                  <el-icon :size="16"><Delete /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
           </template>
         </el-table-column>
         <template #empty>
@@ -97,25 +127,33 @@
         </template>
       </el-table>
       
-      <div class="flex justify-end p-4 border-t border-gray-100">
+      <!-- Pagination Footer -->
+      <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50">
+        <div class="text-xs text-gray-500">Hiển thị trang {{ currentPage }} / tổng số {{ totalElements }} tài khoản.</div>
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="itemsPerPage"
           :page-sizes="[15, 30, 50]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="totalElements"
+          @current-change="fetchData"
+          @size-change="fetchData"
+          class="premium-pagination"
         />
       </div>
     </el-card>
 
-    <!-- Drawer -->
+    <!-- Drawer Form -->
     <el-drawer
       v-model="showModal"
       :title="isViewOnly ? $t('account.view_detail') : (form.id ? $t('account.update') : $t('account.create'))"
       size="50%"
+      @close="showModal = false"
+      class="premium-drawer"
+      custom-class="premium-drawer"
     >
-      <el-form :model="form" label-position="top" :disabled="isViewOnly">
-        <el-form-item :label="$t('account.username')" required>
+      <el-form :model="form" label-position="top" :disabled="isViewOnly" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+        <el-form-item :label="$t('account.username')" required class="col-span-2">
           <el-input v-model="form.username" :disabled="!!form.id" />
         </el-form-item>
         
@@ -127,7 +165,7 @@
           <el-input v-model="form.confirmPassword" type="password" show-password />
         </el-form-item>
         
-        <el-form-item :label="$t('account.role')" required>
+        <el-form-item :label="$t('account.role')" required class="col-span-2">
           <el-select v-model="form.role" class="w-full">
             <el-option :label="$t('account.admin')" value="ADMIN" />
             <el-option :label="$t('account.staff')" value="STAFF" />
@@ -136,26 +174,21 @@
         </el-form-item>
 
         <template v-if="form.role === 'ADMIN' || form.role === 'STAFF'">
-          <el-form-item :label="$t('account.full_name')" required>
+          <el-form-item :label="$t('account.full_name')" required class="col-span-2">
             <el-input v-model="form.fullName" :placeholder="$t('common.placeholder_input')" />
           </el-form-item>
           
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item :label="$t('account.gender')">
-                <el-select v-model="form.gender" class="w-full">
-                  <el-option :label="$t('account.male')" value="Nam" />
-                  <el-option :label="$t('account.female')" value="Nữ" />
-                  <el-option :label="$t('account.other')" value="Khác" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item :label="$t('account.dob')">
-                <el-date-picker v-model="form.dob" type="date" class="w-full" :placeholder="$t('common.placeholder_select')" format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <el-form-item :label="$t('account.gender')">
+            <el-select v-model="form.gender" class="w-full">
+              <el-option :label="$t('account.male')" value="Nam" />
+              <el-option :label="$t('account.female')" value="Nữ" />
+              <el-option :label="$t('account.other')" value="Khác" />
+            </el-select>
+          </el-form-item>
+          
+          <el-form-item :label="$t('account.dob')">
+            <el-date-picker v-model="form.dob" type="date" class="w-full" :placeholder="$t('common.placeholder_select')" format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
+          </el-form-item>
 
           <el-form-item :label="$t('account.phone')">
             <el-input v-model="form.phone" />
@@ -165,12 +198,12 @@
             <el-input v-model="form.email" />
           </el-form-item>
 
-          <el-form-item :label="$t('account.address')">
+          <el-form-item :label="$t('account.address')" class="col-span-2">
             <el-input v-model="form.address" type="textarea" :rows="2" />
           </el-form-item>
         </template>
         
-        <el-form-item v-if="form.role === 'TEACHER'" :label="$t('account.teacher')" required>
+        <el-form-item v-if="form.role === 'TEACHER'" :label="$t('account.teacher')" required class="col-span-2">
           <el-select
             v-model="form.teacherId"
             filterable
@@ -180,28 +213,30 @@
             <el-option
               v-for="t in teachers"
               :key="t.id"
-              :label="`${t.name} (${t.email})`"
+              :label="`${t.fullName} (${t.email})`"
               :value="t.id"
             />
           </el-select>
         </el-form-item>
         
-        <el-form-item>
+        <el-form-item class="col-span-2">
           <el-checkbox v-model="form.active">{{ $t('account.active_account') }}</el-checkbox>
         </el-form-item>
       </el-form>
       
       <template #footer>
-        <div class="flex justify-end space-x-2">
+        <div class="flex justify-end space-x-2 p-4 border-t border-gray-100">
           <template v-if="isViewOnly">
-            <el-button type="primary" @click="isViewOnly = false">
+            <el-button type="primary" @click="isViewOnly = false" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
               <el-icon class="mr-1"><Edit /></el-icon>
               {{ $t('common.edit') }}
             </el-button>
           </template>
           <template v-else>
             <el-button @click="showModal = false">{{ $t('common.cancel') }}</el-button>
-            <el-button type="primary" @click="saveUser">{{ $t('common.save') }}</el-button>
+            <el-button type="primary" @click="saveUser" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
+              {{ $t('common.save') }}
+            </el-button>
           </template>
         </div>
       </template>
@@ -210,10 +245,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
-import { useToastStore } from '@/stores/toast';
-import { Plus, Search, Edit, Delete, View } from '@element-plus/icons-vue';
+import { Plus, Search, Edit, Delete, View, Refresh } from '@element-plus/icons-vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
@@ -225,7 +259,6 @@ const formatDate = (date: string) => {
   return d.toLocaleDateString('vi-VN');
 };
 
-const toastStore = useToastStore();
 const users = ref<any[]>([]);
 const teachers = ref<any[]>([]);
 
@@ -263,6 +296,12 @@ const form = ref<any>({ ...initialForm });
 const resetSearch = () => {
   searchFilters.value = { username: '', role: '', isActive: '', fullName: '', email: '' };
   currentPage.value = 1;
+  fetchData();
+};
+
+const handleSearch = () => {
+  currentPage.value = 1;
+  fetchData();
 };
 
 const fetchData = async () => {
@@ -286,23 +325,10 @@ const fetchData = async () => {
       totalElements.value = resU.data.totalElements;
     }
     if (resT.success) {
-      // Assuming teachers API also returns a page response now, we need to extract content
       teachers.value = resT.data.content || resT.data;
     }
   } catch (err) {}
 };
-
-watch([currentPage, itemsPerPage], () => {
-  fetchData();
-});
-
-// Debounce search input for server side filtering
-let timeoutId: any;
-watch(searchFilters, () => {
-  currentPage.value = 1;
-  clearTimeout(timeoutId);
-  timeoutId = setTimeout(() => fetchData(), 500);
-}, { deep: true });
 
 const openModal = (user?: any, viewOnly: boolean = false) => {
   isViewOnly.value = viewOnly;
@@ -374,3 +400,19 @@ const deleteUser = async (id: number) => {
 
 onMounted(fetchData);
 </script>
+
+<style scoped>
+.premium-table {
+  --el-table-header-bg-color: #f8fafc;
+  --el-table-header-text-color: #475569;
+  border-radius: 12px;
+}
+
+.premium-drawer :deep(.el-drawer__header) {
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 800;
+  color: #0f172a;
+}
+</style>

@@ -15514,3 +15514,5 @@
 /node_modules/vue-component-type-helpers/package.json
 /node_modules/vue-component-type-helpers/README.md
 /.idea/vcs.xml
+/dist/
+/node_modules/

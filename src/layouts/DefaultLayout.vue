@@ -40,6 +40,10 @@
             <el-icon><Location /></el-icon>
             <template #title>{{ $t('menu.rooms') }}</template>
           </el-menu-item>
+          <el-menu-item index="/skills">
+            <el-icon><Reading /></el-icon>
+            <template #title>{{ $t('menu.skills') }}</template>
+          </el-menu-item>
         </template>
 
         <el-menu-item index="/timetable">

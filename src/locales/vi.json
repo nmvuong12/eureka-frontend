@@ -29,7 +29,8 @@
     "rooms": "Phòng & Ca học",
     "courses": "Khóa & Lớp học",
     "timetable": "Thời khóa biểu",
-    "leaves": "Đơn xin nghỉ"
+    "leaves": "Đơn xin nghỉ",
+    "skills": "Kỹ năng chuyên môn"
   },
   "account": {
     "title": "Quản lý Tài khoản",
@@ -81,7 +82,7 @@
     "btn": "Đăng nhập",
     "error_required": "Vui lòng nhập đầy đủ thông tin",
     "error_failed": "Đăng nhập thất bại",
-    "error_server": "Lỗi kết nối server",
+    "error_server": "Lỗi kết nối đến máy chủ",
     "sample_accounts": "Tài khoản mẫu:"
   },
   "room": {
@@ -182,5 +183,15 @@
     "confirm_new_password": "Xác nhận mật khẩu mới",
     "update_success": "Cập nhật thông tin thành công",
     "password_change_success": "Đổi mật khẩu thành công"
+  },
+  "skill": {
+    "title": "Quản lý kỹ năng chuyên môn",
+    "code": "Mã kỹ năng",
+    "name": "Tên kỹ năng",
+    "description": "Mô tả",
+    "create": "Thêm mới kỹ năng",
+    "update": "Cập nhật kỹ năng",
+    "view_detail": "Chi tiết kỹ năng",
+    "delete_confirm": "Bạn có chắc chắn muốn xóa kỹ năng này?"
   }
 }

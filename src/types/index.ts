@@ -1,11 +1,22 @@
 export interface Teacher {
   id?: number;
-  name: string;
+  name?: string;               // Legacy field for backward compatibility
+  fullName?: string;           // Full name of the teacher
   email: string;
   phone: string;
-  status: string;
-  skills?: string[];
-  createdAt?: string;
+  status?: string;             // Legacy field for backward compatibility
+  workingStatus?: string;      // ACTIVE, INACTIVE, ON_LEAVE
+  teacherCode?: string;        // Teacher code (e.g. GV0001)
+  teacherType?: string;        // FULL_TIME, PART_TIME
+  gender?: string;             // MALE, FEMALE, OTHER
+  dateOfBirth?: string;        // YYYY-MM-DD
+  address?: string;            // Contact address
+  skills?: string | string[];  // Support both array and comma-separated string formats
+  certificateFile?: string;   // Path to certificate file
+  profileFile?: string;       // Path to profile file
+  deleted?: boolean;           // Soft delete flag
+  createdAt?: string;          // Creation timestamp
+  modifiedDate?: string;       // Modification timestamp
 }
 
 export interface Course {

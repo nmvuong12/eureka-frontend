@@ -51,6 +51,12 @@ const routes = [
         path: 'leave',
         name: 'Leave',
         component: () => import('@/pages/LeaveManagement.vue')
+      },
+      {
+        path: 'skills',
+        name: 'Skills',
+        component: () => import('@/pages/SkillManagement.vue'),
+        meta: { roles: ['ADMIN', 'STAFF'] }
       }
     ]
   }
@@ -61,7 +67,7 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {

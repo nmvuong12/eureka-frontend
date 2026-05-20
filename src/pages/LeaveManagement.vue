@@ -1,84 +1,154 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">{{ $t('leave.title') }}</h1>
-      <button v-if="authStore.isTeacher" @click="openModal()" class="btn-primary">{{ $t('leave.create') }}</button>
+  <div class="space-y-6">
+    <!-- Page Header -->
+    <div class="pb-4 border-b border-gray-100">
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
+        <span class="bg-gradient-to-b from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
+        {{ $t('leave.title') }}
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">Quản lý đơn xin nghỉ phép của giáo viên, phê duyệt và theo dõi trạng thái.</p>
     </div>
 
-    <div class="card overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('teacher.id') }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('leave.from') }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('leave.to') }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('leave.reason') }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('common.status') }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('common.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4">{{ req.teacherId }}</td>
-            <td class="px-6 py-4">{{ req.fromDate }}</td>
-            <td class="px-6 py-4">{{ req.toDate }}</td>
-            <td class="px-6 py-4">{{ req.reason }}</td>
-            <td class="px-6 py-4">
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                :class="{
-                  'bg-yellow-100 text-yellow-800': req.status === 'PENDING',
-                  'bg-green-100 text-green-800': req.status === 'APPROVED',
-                  'bg-red-100 text-red-800': req.status === 'REJECTED'
-                }"
-              >
-                {{ req.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4 space-x-2 flex items-center">
-              <button @click="openModal(req, true)" class="text-emerald-600 hover:text-emerald-900 font-medium">{{ $t('common.view') }}</button>
-              <template v-if="authStore.isAdmin || !authStore.isTeacher">
-                <button v-if="req.status === 'PENDING'" @click="approve(req.id!)" class="text-emerald-600 hover:text-emerald-900 font-medium">{{ $t('leave.approve') }}</button>
-                <button v-if="req.status === 'PENDING'" @click="reject(req.id!)" class="text-red-600 hover:text-red-900 font-medium">{{ $t('leave.reject') }}</button>
-              </template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Action bar -->
+    <div class="flex justify-between items-center">
+      <div></div>
+      <el-button
+        v-if="authStore.isTeacher"
+        type="primary"
+        @click="openModal()"
+        class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md"
+      >
+        <el-icon class="mr-1"><Plus /></el-icon>
+        {{ $t('leave.create') }}
+      </el-button>
     </div>
+
+    <!-- Table Card -->
+    <el-card shadow="sm" class="border border-gray-100 rounded-2xl overflow-hidden" :body-style="{ padding: '0' }">
+      <el-table :data="requests" style="width: 100%" stripe class="premium-table" v-loading="loading">
+        <el-table-column prop="teacherId" :label="$t('teacher.id')" width="120">
+          <template #default="{ row }">
+            <span class="font-semibold text-gray-700">{{ row.teacherId }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="fromDate" :label="$t('leave.from')" width="150">
+          <template #default="{ row }">
+            <span class="text-gray-600 font-medium">{{ formatDate(row.fromDate) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="toDate" :label="$t('leave.to')" width="150">
+          <template #default="{ row }">
+            <span class="text-gray-600 font-medium">{{ formatDate(row.toDate) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="reason" :label="$t('leave.reason')" min-width="200" show-overflow-tooltip />
+        <el-table-column :label="$t('common.status')" width="140">
+          <template #default="{ row }">
+            <el-tag
+              :type="statusTagType(row.status)"
+              effect="light"
+              class="font-bold rounded-lg"
+            >
+              {{ statusLabel(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.actions')" width="200" fixed="right">
+          <template #default="{ row }">
+            <div class="flex items-center gap-1">
+              <el-tooltip content="Xem chi tiết" placement="top">
+                <el-button type="info" link @click="openModal(row, true)">
+                  <el-icon :size="16"><View /></el-icon>
+                </el-button>
+              </el-tooltip>
+              <template v-if="authStore.isAdmin || !authStore.isTeacher">
+                <el-tooltip v-if="row.status === 'PENDING'" content="Phê duyệt" placement="top">
+                  <el-button type="success" link @click="approve(row.id)">
+                    <el-icon :size="16"><Check /></el-icon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip v-if="row.status === 'PENDING'" content="Từ chối" placement="top">
+                  <el-button type="danger" link @click="reject(row.id)">
+                    <el-icon :size="16"><Close /></el-icon>
+                  </el-button>
+                </el-tooltip>
+              </template>
+            </div>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty description="Không có đơn xin nghỉ nào" />
+        </template>
+      </el-table>
+    </el-card>
 
     <!-- Drawer Form -->
-    <Drawer
-      :is-open="showModal"
+    <el-drawer
+      v-model="showModal"
       :title="isViewOnly ? $t('leave.view_detail') : (formId ? $t('common.edit') : $t('leave.create'))"
+      size="480px"
       @close="showModal = false"
+      class="premium-drawer"
+      custom-class="premium-drawer"
     >
-      <form @submit.prevent="submitRequest" id="leaveForm" class="space-y-6">
-        <fieldset :disabled="isViewOnly" class="space-y-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">{{ $t('leave.from') }}</label>
-            <input v-model="form.fromDate" type="date" required class="input-field mt-1" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">{{ $t('leave.to') }}</label>
-            <input v-model="form.toDate" type="date" required class="input-field mt-1" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">{{ $t('leave.reason') }}</label>
-            <textarea v-model="form.reason" required class="input-field mt-1" rows="4"></textarea>
-          </div>
-        </fieldset>
-      </form>
+      <el-form :model="form" label-position="top" :disabled="isViewOnly" class="px-2">
+        <el-form-item :label="$t('leave.from')" required>
+          <el-date-picker
+            v-model="form.fromDate"
+            type="date"
+            class="w-full"
+            placeholder="Chọn ngày bắt đầu nghỉ"
+            format="DD/MM/YYYY"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('leave.to')" required>
+          <el-date-picker
+            v-model="form.toDate"
+            type="date"
+            class="w-full"
+            placeholder="Chọn ngày kết thúc nghỉ"
+            format="DD/MM/YYYY"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('leave.reason')" required>
+          <el-input
+            v-model="form.reason"
+            type="textarea"
+            :rows="5"
+            placeholder="Nhập lý do xin nghỉ phép..."
+          />
+        </el-form-item>
+      </el-form>
+
       <template #footer>
-        <template v-if="isViewOnly">
-          <button v-if="formId && currentStatus === 'PENDING'" type="button" @click="isViewOnly = false" class="btn-primary">{{ $t('common.edit') }}</button>
-        </template>
-        <template v-else>
-          <button type="button" @click="showModal = false" class="btn-secondary">{{ $t('common.cancel') }}</button>
-          <button type="submit" form="leaveForm" class="btn-primary">{{ formId ? $t('common.save') : $t('leave.create') }}</button>
-        </template>
+        <div class="flex justify-end gap-2 p-4 border-t border-gray-100">
+          <template v-if="isViewOnly">
+            <el-button
+              v-if="formId && currentStatus === 'PENDING'"
+              type="primary"
+              @click="isViewOnly = false"
+              class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600"
+            >
+              <el-icon class="mr-1"><Edit /></el-icon>
+              {{ $t('common.edit') }}
+            </el-button>
+          </template>
+          <template v-else>
+            <el-button @click="showModal = false">{{ $t('common.cancel') }}</el-button>
+            <el-button
+              type="primary"
+              @click="submitRequest"
+              :loading="saving"
+              class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600"
+            >
+              {{ formId ? $t('common.save') : $t('leave.create') }}
+            </el-button>
+          </template>
+        </div>
       </template>
-    </Drawer>
+    </el-drawer>
   </div>
 </template>
 
@@ -87,27 +157,63 @@ import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import type { LeaveRequest } from '@/types';
-import Drawer from '@/components/Drawer.vue';
+import { Plus, View, Edit, Check, Close } from '@element-plus/icons-vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const authStore = useAuthStore();
 const requests = ref<LeaveRequest[]>([]);
+const loading = ref(false);
+const saving = ref(false);
 const showModal = ref(false);
 const isViewOnly = ref(false);
 const formId = ref<number | null>(null);
 const currentStatus = ref<string | null>(null);
 const form = ref({ fromDate: '', toDate: '', reason: '' });
 
+/** Format ngày về dạng DD/MM/YYYY */
+const formatDate = (date: string) => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString('vi-VN');
+};
+
+/** Trả về kiểu tag Element Plus theo trạng thái đơn */
+const statusTagType = (status: string): 'warning' | 'success' | 'danger' | 'info' => {
+  const map: Record<string, 'warning' | 'success' | 'danger' | 'info'> = {
+    PENDING: 'warning',
+    APPROVED: 'success',
+    REJECTED: 'danger',
+  };
+  return map[status] ?? 'info';
+};
+
+/** Trả về nhãn hiển thị theo trạng thái */
+const statusLabel = (status: string) => {
+  const map: Record<string, string> = {
+    PENDING: 'Chờ duyệt',
+    APPROVED: 'Đã duyệt',
+    REJECTED: 'Từ chối',
+  };
+  return map[status] ?? status;
+};
+
+/** Tải danh sách đơn nghỉ phép */
 const fetchRequests = async () => {
+  loading.value = true;
   try {
     const endpoint = authStore.isTeacher ? '/leave-requests/my-requests' : '/leave-requests';
     const res: any = await api.get(endpoint);
     if (res.success) requests.value = res.data;
-  } catch (err) {}
+  } catch (err) {
+    ElMessage.error(t('common.error'));
+  } finally {
+    loading.value = false;
+  }
 };
 
+/** Mở drawer tạo mới hoặc xem chi tiết đơn nghỉ */
 const openModal = (req?: LeaveRequest, viewOnly: boolean = false) => {
   isViewOnly.value = viewOnly;
   if (req) {
@@ -122,7 +228,13 @@ const openModal = (req?: LeaveRequest, viewOnly: boolean = false) => {
   showModal.value = true;
 };
 
+/** Gửi yêu cầu tạo mới hoặc cập nhật đơn nghỉ */
 const submitRequest = async () => {
+  if (!form.value.fromDate || !form.value.toDate || !form.value.reason) {
+    ElMessage.warning('Vui lòng điền đầy đủ thông tin');
+    return;
+  }
+  saving.value = true;
   try {
     let res: any;
     if (formId.value) {
@@ -133,26 +245,73 @@ const submitRequest = async () => {
     if (res.success) {
       showModal.value = false;
       fetchRequests();
-      alert(t('leave.success'));
+      ElMessage.success(t('leave.success') || 'Gửi đơn nghỉ phép thành công');
+    } else {
+      ElMessage.error(res.message || t('common.error'));
     }
-  } catch (err: any) { alert(err.message || t('common.error')); }
-};
-
-const approve = async (id: number) => {
-  if (confirm(t('leave.confirm_approve'))) {
-    try {
-      const res: any = await api.put(`/leave-requests/${id}/approve`);
-      if (res.success) fetchRequests();
-    } catch (err) { alert(t('common.error')); }
+  } catch (err: any) {
+    ElMessage.error(err.response?.data?.message || t('common.error'));
+  } finally {
+    saving.value = false;
   }
 };
 
+/** Phê duyệt đơn nghỉ (chỉ dành cho Admin/Giáo vụ) */
+const approve = async (id: number) => {
+  try {
+    await ElMessageBox.confirm(
+      t('leave.confirm_approve') || 'Bạn có chắc chắn muốn phê duyệt đơn nghỉ này?',
+      'Xác nhận phê duyệt',
+      { type: 'warning', confirmButtonText: 'Phê duyệt', cancelButtonText: t('common.cancel') }
+    );
+    const res: any = await api.put(`/leave-requests/${id}/approve`);
+    if (res.success) {
+      fetchRequests();
+      ElMessage.success('Đã phê duyệt đơn nghỉ phép');
+    }
+  } catch {
+    // Người dùng hủy - không làm gì
+  }
+};
+
+/** Từ chối đơn nghỉ (chỉ dành cho Admin/Giáo vụ) */
 const reject = async (id: number) => {
   try {
+    await ElMessageBox.confirm(
+      'Bạn có chắc chắn muốn từ chối đơn nghỉ này?',
+      'Xác nhận từ chối',
+      { type: 'error', confirmButtonText: 'Từ chối', cancelButtonText: t('common.cancel') }
+    );
     const res: any = await api.put(`/leave-requests/${id}/reject`);
-    if (res.success) fetchRequests();
-  } catch (err) { alert(t('common.error')); }
+    if (res.success) {
+      fetchRequests();
+      ElMessage.success('Đã từ chối đơn nghỉ phép');
+    }
+  } catch {
+    // Người dùng hủy - không làm gì
+  }
 };
 
 onMounted(fetchRequests);
 </script>
+
+<style scoped>
+.premium-table {
+  --el-table-header-bg-color: #f8fafc;
+  --el-table-header-text-color: #475569;
+  border-radius: 0;
+}
+
+:deep(.premium-drawer .el-drawer__header) {
+  margin-bottom: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+:deep(.premium-drawer .el-drawer__body) {
+  padding: 24px;
+}
+</style>
