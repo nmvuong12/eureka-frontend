@@ -32,24 +32,60 @@
             <el-icon><Avatar /></el-icon>
             <template #title>{{ $t('menu.teachers') }}</template>
           </el-menu-item>
-          <el-menu-item index="/courses">
-            <el-icon><Reading /></el-icon>
-            <template #title>{{ $t('menu.courses') }}</template>
-          </el-menu-item>
+
+          <!-- Quản lý Khóa học (sub-menu) -->
+          <el-sub-menu index="courses-group">
+            <template #title>
+              <el-icon><Reading /></el-icon>
+              <span>Quản lý Khóa học</span>
+            </template>
+            <el-menu-item index="/courses/catalog">
+              <el-icon><Collection /></el-icon>
+              <template #title>Danh mục khóa học</template>
+            </el-menu-item>
+            <el-menu-item index="/courses/batches">
+              <el-icon><Calendar /></el-icon>
+              <template #title>Kế hoạch khai giảng</template>
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- Quản lý Lớp học (sub-menu) -->
+          <el-sub-menu index="classes-group">
+            <template #title>
+              <el-icon><Notebook /></el-icon>
+              <span>Quản lý Lớp học</span>
+            </template>
+            <el-menu-item index="/classes/list">
+              <el-icon><List /></el-icon>
+              <template #title>Danh sách lớp học</template>
+            </el-menu-item>
+            <el-menu-item index="/classes/planning">
+              <el-icon><SetUp /></el-icon>
+              <template #title>Lập kế hoạch mở lớp</template>
+            </el-menu-item>
+          </el-sub-menu>
+
           <el-menu-item index="/rooms">
             <el-icon><Location /></el-icon>
             <template #title>{{ $t('menu.rooms') }}</template>
           </el-menu-item>
           <el-menu-item index="/skills">
-            <el-icon><Reading /></el-icon>
+            <el-icon><Medal /></el-icon>
             <template #title>{{ $t('menu.skills') }}</template>
           </el-menu-item>
         </template>
 
-        <el-menu-item index="/timetable">
-          <el-icon><Calendar /></el-icon>
-          <template #title>{{ $t('menu.timetable') }}</template>
-        </el-menu-item>
+        <!-- Quản lý lịch giảng dạy -->
+        <el-sub-menu index="schedule-group">
+          <template #title>
+            <el-icon><Calendar /></el-icon>
+            <span>Quản lý Lịch giảng dạy</span>
+          </template>
+          <el-menu-item index="/timetable">
+            <el-icon><Grid /></el-icon>
+            <template #title>{{ $t('menu.timetable') }}</template>
+          </el-menu-item>
+        </el-sub-menu>
 
         <el-menu-item index="/leave">
           <el-icon><Document /></el-icon>
@@ -192,7 +228,8 @@ import { ref, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { 
-  HomeFilled, User, Avatar, Reading, Location, Calendar, Document, SwitchButton, Fold, Expand, Bell, Refresh, ArrowDown, Lock
+  HomeFilled, User, Avatar, Reading, Location, Calendar, Document, SwitchButton, Fold, Expand, Bell, Refresh, ArrowDown, Lock,
+  Notebook, Collection, List, SetUp, Medal, Grid
 } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/api/axios';
@@ -298,6 +335,17 @@ const handleLogout = () => {
 }
 .el-menu-item:hover {
   background-color: var(--el-color-primary-light-9);
+}
+:deep(.el-sub-menu__title) {
+  border-radius: 8px;
+  margin: 4px 8px;
+  width: auto;
+}
+:deep(.el-sub-menu__title:hover) {
+  background-color: var(--el-color-primary-light-9);
+}
+:deep(.el-menu--inline .el-menu-item) {
+  padding-left: 40px !important;
 }
 
 .fade-transform-enter-active,
