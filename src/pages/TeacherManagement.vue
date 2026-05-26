@@ -251,12 +251,14 @@
             collapse-tags-tooltip
             placeholder="Chọn các kỹ năng chuyên môn được quản lý..."
             class="w-full"
+            @change="handleSkillsChange"
           >
             <el-option
               v-for="skill in allSkills"
               :key="skill.id"
               :label="`${skill.skillName} (${skill.skillCode})`"
               :value="skill.skillCode"
+              :disabled="isSkillDisabled(skill)"
             />
           </el-select>
         </el-form-item>
@@ -582,6 +584,7 @@ const openModal = (teacher?: any, viewOnly: boolean = false) => {
     selectedSkillsArray.value = teacher.skills
       ? teacher.skills.split(',').map((s: string) => s.trim()).filter((s: string) => s)
       : [];
+    handleSkillsChange(selectedSkillsArray.value);
   } else {
     currentTeacher.value = {
       id: null,
@@ -736,6 +739,35 @@ const deleteAvailability = async (availabilityId: number) => {
 const getSkillList = (skillsString: string) => {
   if (!skillsString) return [];
   return skillsString.split(',').map(s => s.trim()).filter(s => s);
+};
+
+const isSkillDisabled = (skill: any) => {
+  if (!skill || !skill.skillGroup || !skill.levelRank) return false;
+  return selectedSkillsArray.value.some(code => {
+    if (code === skill.skillCode) return false;
+    const s = allSkills.value.find(item => item.skillCode === code);
+    return s && s.skillGroup === skill.skillGroup && s.levelRank > skill.levelRank;
+  });
+};
+
+const handleSkillsChange = (newVal: string[]) => {
+  if (!newVal || newVal.length <= 1) return;
+  const filtered = [...newVal];
+  for (let i = filtered.length - 1; i >= 0; i--) {
+    const code = filtered[i];
+    const skill = allSkills.value.find(s => s.skillCode === code);
+    if (skill && skill.skillGroup && skill.levelRank) {
+      const hasHigher = filtered.some(otherCode => {
+        if (otherCode === code) return false;
+        const otherSkill = allSkills.value.find(s => s.skillCode === otherCode);
+        return otherSkill && otherSkill.skillGroup === skill.skillGroup && otherSkill.levelRank > skill.levelRank;
+      });
+      if (hasHigher) {
+        filtered.splice(i, 1);
+      }
+    }
+  }
+  selectedSkillsArray.value = filtered;
 };
 
 const getStatusType = (status: string) => {

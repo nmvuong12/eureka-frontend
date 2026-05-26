@@ -258,6 +258,7 @@
               :key="skill.skillCode"
               :label="`${skill.skillName} (${skill.skillCode})`"
               :value="skill.skillCode"
+              :disabled="isSkillDisabled(skill)"
             />
           </el-select>
         </el-form-item>
@@ -491,6 +492,14 @@ const getStatusLabel = (status?: string) => {
   if (status === 'INACTIVE') return 'Không hoạt động';
   if (status === 'DISCONTINUED') return 'Ngừng KT';
   return status || '—';
+};
+
+/** Kiểm tra kỹ năng có bị vô hiệu hóa không */
+const isSkillDisabled = (_skill: any) => {
+  // Đối với trường hợp chọn 1 kỹ năng (Single-Select) tại Danh mục khóa học,
+  // người dùng có thể chọn đổi sang bất kỳ cấp độ nào tùy ý.
+  // Thiết kế sẵn sàng ở đây cho trường hợp mở rộng chọn nhiều kỹ năng.
+  return false;
 };
 
 onMounted(() => {

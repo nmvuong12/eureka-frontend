@@ -85,6 +85,10 @@
             <el-icon><Grid /></el-icon>
             <template #title>{{ $t('menu.timetable') }}</template>
           </el-menu-item>
+          <el-menu-item index="/classes/dispatch">
+            <el-icon><Clock /></el-icon>
+            <template #title>Điều phối lịch giảng dạy</template>
+          </el-menu-item>
         </el-sub-menu>
 
         <el-menu-item index="/leave">

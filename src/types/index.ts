@@ -163,6 +163,7 @@ export interface TimetableEntry {
   endTime: string;
   timeslotLabel: string;
   pinned: boolean;
+  sessionDate?: string;
 }
 
 export interface LeaveRequest {

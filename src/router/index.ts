@@ -48,6 +48,11 @@ const routes = [
         component: () => import('@/pages/ClassPlanningBoard.vue'),
         meta: { roles: ['ADMIN', 'STAFF'] }
       },
+      {
+        path: 'classes/dispatch', name: 'ClassDispatch',
+        component: () => import('@/pages/DispatchCoordinator.vue'),
+        meta: { roles: ['ADMIN', 'STAFF'] }
+      },
       // ---- Các trang khác ----
       {
         path: 'rooms', name: 'Rooms',

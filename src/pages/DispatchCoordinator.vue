@@ -211,11 +211,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import api from '@/api/axios';
 import { Edit, Lock, Unlock, OfficeBuilding, Warning, Check } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { format } from 'date-fns';
 
+const route = useRoute();
 const selectedDate = ref(format(new Date(), 'yyyy-MM-dd'));
 const loading = ref(false);
 const saving = ref(false);
@@ -311,6 +313,9 @@ const formatDateLabel = (dateStr: string) => {
 };
 
 onMounted(() => {
+  if (route.query.date) {
+    selectedDate.value = route.query.date as string;
+  }
   loadMetadata();
   fetchDailyDispatch();
 });
