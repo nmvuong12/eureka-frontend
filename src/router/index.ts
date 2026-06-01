@@ -62,6 +62,12 @@ const routes = [
       { path: 'timetable', name: 'Timetable', component: () => import('@/pages/TimetableView.vue') },
       { path: 'leave', name: 'Leave', component: () => import('@/pages/LeaveManagement.vue') },
       {
+        path: 'teacher-unavailable',
+        name: 'TeacherUnavailable',
+        component: () => import('@/pages/TeacherUnavailable.vue'),
+        meta: { roles: ['ADMIN', 'STAFF', 'TEACHER'] }
+      },
+      {
         path: 'skills', name: 'Skills',
         component: () => import('@/pages/SkillManagement.vue'),
         meta: { roles: ['ADMIN', 'STAFF'] }

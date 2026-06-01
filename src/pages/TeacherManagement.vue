@@ -7,7 +7,7 @@
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
           {{ $t('teacher.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Quản lý hồ sơ, lịch dạy, trình độ chuyên môn và lịch rảnh của giáo viên.</p>
+        <p class="text-sm text-gray-500 mt-1">Quản lý hồ sơ, lịch dạy và trình độ chuyên môn của giáo viên.</p>
       </div>
       <el-button type="primary" @click="openModal()" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300">
         <el-icon class="mr-1"><Plus /></el-icon>
@@ -148,11 +148,7 @@
                 </el-button>
               </el-tooltip>
               
-              <el-tooltip v-if="row.teacherType === 'PART_TIME'" content="Lịch rảnh giảng dạy" placement="top">
-                <el-button type="warning" link @click="openAvailability(row)" class="hover:!text-amber-600">
-                  <el-icon :size="16"><Clock /></el-icon>
-                </el-button>
-              </el-tooltip>
+
               
               <el-tooltip content="Chỉnh sửa" placement="top">
                 <el-button type="primary" link @click="openModal(row, false)" class="hover:!text-emerald-600">
@@ -325,101 +321,7 @@
       </template>
     </el-drawer>
 
-    <!-- Availability Dialog for PART_TIME teachers -->
-    <el-dialog
-      v-model="showAvailabilityModal"
-      :title="`Lịch rảnh giảng dạy - GV ${selectedTeacherForAvailability?.fullName} (${selectedTeacherForAvailability?.teacherCode})`"
-      width="60%"
-      destroy-on-close
-      custom-class="premium-dialog"
-    >
-      <div class="space-y-6">
-        <!-- Add New Availability Slot -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-1.5">
-            <el-icon class="text-emerald-500"><Plus /></el-icon>
-            Đăng ký thêm khung giờ rảnh mới
-          </h3>
-          <el-form :model="availabilityForm" inline class="flex flex-wrap gap-4 items-end">
-            <el-form-item label="Thứ trong tuần" class="!mb-0">
-              <el-select v-model="availabilityForm.dayOfWeek" placeholder="Chọn ngày" class="w-40">
-                <el-option label="Thứ Hai" value="MONDAY" />
-                <el-option label="Thứ Ba" value="TUESDAY" />
-                <el-option label="Thứ Tư" value="WEDNESDAY" />
-                <el-option label="Thứ Năm" value="THURSDAY" />
-                <el-option label="Thứ Sáu" value="FRIDAY" />
-                <el-option label="Thứ Bảy" value="SATURDAY" />
-                <el-option label="Chủ Nhật" value="SUNDAY" />
-              </el-select>
-            </el-form-item>
-            
-            <el-form-item label="Giờ bắt đầu" class="!mb-0">
-              <el-time-select
-                v-model="availabilityForm.startTime"
-                start="07:00"
-                step="00:15"
-                end="21:30"
-                placeholder="08:00"
-                format="HH:mm"
-                class="w-36"
-              />
-            </el-form-item>
 
-            <el-form-item label="Giờ kết thúc" class="!mb-0">
-              <el-time-select
-                v-model="availabilityForm.endTime"
-                start="07:30"
-                step="00:15"
-                end="22:00"
-                placeholder="10:00"
-                format="HH:mm"
-                class="w-36"
-              />
-            </el-form-item>
-
-            <el-form-item class="!mb-0">
-              <el-button type="primary" @click="submitAvailability" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
-                <el-icon class="mr-1"><Check /></el-icon>
-                Đăng ký
-              </el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-
-        <!-- Registered Availability List -->
-        <div>
-          <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-1.5">
-            <el-icon class="text-emerald-500"><Calendar /></el-icon>
-            Danh sách khung giờ rảnh hiện có
-          </h3>
-          <el-table :data="availabilities" border stripe style="width: 100%" class="mini-table">
-            <el-table-column label="Thứ trong tuần">
-              <template #default="{ row }">
-                <span class="font-semibold text-gray-700">{{ formatDayOfWeek(row.dayOfWeek) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Khoảng thời gian rảnh">
-              <template #default="{ row }">
-                <span class="inline-flex items-center gap-1 px-3 py-1 rounded bg-amber-50 text-amber-800 border border-amber-100 font-medium">
-                  <el-icon><Clock /></el-icon>
-                  {{ formatTime(row.startTime) }} - {{ formatTime(row.endTime) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Thao tác" width="100" align="center">
-              <template #default="{ row }">
-                <el-button type="danger" link @click="deleteAvailability(row.id)">
-                  <el-icon><Delete /></el-icon> Xóa
-                </el-button>
-              </template>
-            </el-table-column>
-            <template #empty>
-              <el-empty description="Chưa có khung giờ rảnh nào được đăng ký." :image-size="80" />
-            </template>
-          </el-table>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -427,7 +329,7 @@
 import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
 import type { Teacher } from '@/types';
-import { Plus, Search, Edit, Delete, View, Refresh, Phone, Message, Location, Clock, Calendar, Check, Upload, Download } from '@element-plus/icons-vue';
+import { Plus, Search, Edit, Delete, View, Refresh, Phone, Message, Location, Upload, Download } from '@element-plus/icons-vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
@@ -469,15 +371,7 @@ const currentTeacher = ref<any>({
   workingStatus: 'ACTIVE'
 });
 
-// Availability Modal States
-const showAvailabilityModal = ref(false);
-const selectedTeacherForAvailability = ref<any>(null);
-const availabilities = ref<any[]>([]);
-const availabilityForm = ref({
-  dayOfWeek: 'MONDAY',
-  startTime: '08:00',
-  endTime: '10:00'
-});
+
 
 // Professional Skills and File Upload States
 const allSkills = ref<any[]>([]);
@@ -672,68 +566,7 @@ const deleteTeacher = async (id: number) => {
   }
 };
 
-// Availability management methods
-const openAvailability = async (teacher: any) => {
-  selectedTeacherForAvailability.value = teacher;
-  availabilityForm.value = {
-    dayOfWeek: 'MONDAY',
-    startTime: '08:00',
-    endTime: '10:00'
-  };
-  await fetchAvailabilities();
-  showAvailabilityModal.value = true;
-};
 
-const fetchAvailabilities = async () => {
-  if (!selectedTeacherForAvailability.value) return;
-  try {
-    const res: any = await api.get(`/teachers/${selectedTeacherForAvailability.value.id}/availability`);
-    if (res.success) {
-      availabilities.value = res.data;
-    }
-  } catch (err) {
-    ElMessage.error('Lỗi khi tải lịch rảnh của giáo viên');
-  }
-};
-
-const submitAvailability = async () => {
-  try {
-    const payload = {
-      teacherId: selectedTeacherForAvailability.value.id,
-      dayOfWeek: availabilityForm.value.dayOfWeek,
-      startTime: availabilityForm.value.startTime,
-      endTime: availabilityForm.value.endTime
-    };
-
-    const res: any = await api.post('/teachers/availability', payload);
-    if (res.success) {
-      ElMessage.success('Đăng ký lịch rảnh thành công');
-      await fetchAvailabilities();
-    } else {
-      ElMessage.error(res.message || 'Không thể đăng ký lịch rảnh');
-    }
-  } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Khung giờ rảnh bị trùng lặp hoặc không hợp lệ');
-  }
-};
-
-const deleteAvailability = async (availabilityId: number) => {
-  try {
-    await ElMessageBox.confirm('Bạn có chắc chắn muốn xóa ca rảnh này không?', 'Xác nhận xóa', {
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
-      type: 'warning',
-    });
-
-    const res: any = await api.delete(`/teachers/availability/${availabilityId}`);
-    if (res.success) {
-      ElMessage.success('Xóa ca rảnh thành công');
-      await fetchAvailabilities();
-    }
-  } catch (err) {
-    // Canceled
-  }
-};
 
 // Helper Formatters
 const getSkillList = (skillsString: string) => {
@@ -782,24 +615,7 @@ const getStatusLabel = (status: string) => {
   return 'Tạm khóa';
 };
 
-const formatDayOfWeek = (day: string) => {
-  const map: Record<string, string> = {
-    MONDAY: 'Thứ Hai',
-    TUESDAY: 'Thứ Ba',
-    WEDNESDAY: 'Thứ Tư',
-    THURSDAY: 'Thứ Năm',
-    FRIDAY: 'Thứ Sáu',
-    SATURDAY: 'Thứ Bảy',
-    SUNDAY: 'Chủ Nhật'
-  };
-  return map[day] || day;
-};
 
-const formatTime = (timeStr: any) => {
-  if (!timeStr) return '';
-  // Handles LocalTime or java.sql.Time representation
-  return timeStr.substring(0, 5);
-};
 
 onMounted(() => {
   fetchTeachers();

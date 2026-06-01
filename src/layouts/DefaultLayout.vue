@@ -28,10 +28,6 @@
         </template>
 
         <template v-if="authStore.isAdmin || !authStore.isTeacher">
-          <el-menu-item index="/teachers">
-            <el-icon><Avatar /></el-icon>
-            <template #title>{{ $t('menu.teachers') }}</template>
-          </el-menu-item>
 
           <!-- Quản lý Khóa học (sub-menu) -->
           <el-sub-menu index="courses-group">
@@ -97,6 +93,22 @@
           <el-menu-item index="/classes/dispatch">
             <el-icon><Clock /></el-icon>
             <template #title>Điều phối lịch giảng dạy</template>
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- Quản lý Giáo viên (Hiển thị cho tất cả nhưng phân quyền bên trong) -->
+        <el-sub-menu index="teachers-group">
+          <template #title>
+            <el-icon><Avatar /></el-icon>
+            <span>Quản lý Giáo viên</span>
+          </template>
+          <el-menu-item v-if="authStore.isAdmin || authStore.isStaff" index="/teachers">
+            <el-icon><List /></el-icon>
+            <template #title>Danh sách giáo viên</template>
+          </el-menu-item>
+          <el-menu-item index="/teacher-unavailable">
+            <el-icon><CircleClose /></el-icon>
+            <template #title>Đăng ký lịch bận</template>
           </el-menu-item>
         </el-sub-menu>
 
