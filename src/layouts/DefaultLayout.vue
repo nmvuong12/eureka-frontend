@@ -65,6 +65,11 @@
             </el-menu-item>
           </el-sub-menu>
 
+          <el-menu-item index="/patterns">
+            <el-icon><Calendar /></el-icon>
+            <template #title>Quản lý mẫu lịch</template>
+          </el-menu-item>
+
           <el-menu-item index="/rooms">
             <el-icon><Location /></el-icon>
             <template #title>{{ $t('menu.rooms') }}</template>
@@ -72,6 +77,10 @@
           <el-menu-item index="/skills">
             <el-icon><Medal /></el-icon>
             <template #title>{{ $t('menu.skills') }}</template>
+          </el-menu-item>
+          <el-menu-item index="/algorithm-config">
+            <el-icon><SetUp /></el-icon>
+            <template #title>Cấu hình thuật toán</template>
           </el-menu-item>
         </template>
 

@@ -65,6 +65,16 @@ const routes = [
         path: 'skills', name: 'Skills',
         component: () => import('@/pages/SkillManagement.vue'),
         meta: { roles: ['ADMIN', 'STAFF'] }
+      },
+      {
+        path: 'algorithm-config', name: 'AlgorithmConfig',
+        component: () => import('@/pages/AlgorithmConfig.vue'),
+        meta: { roles: ['ADMIN', 'STAFF'] }
+      },
+      {
+        path: 'patterns', name: 'PatternManagement',
+        component: () => import('@/pages/PatternManagement.vue'),
+        meta: { roles: ['ADMIN', 'STAFF'] }
       }
     ]
   }

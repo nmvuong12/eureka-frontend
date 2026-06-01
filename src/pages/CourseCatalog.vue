@@ -7,7 +7,7 @@
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
           Danh mục Khóa học
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Quản lý danh mục các khóa học, học phí và các thông số kỹ thuật.</p>
+        <p class="text-sm text-gray-500 mt-1">Quản lý danh mục các khóa học và các thông số kỹ thuật.</p>
       </div>
       <el-button
         type="primary"
@@ -98,14 +98,7 @@
           </template>
         </el-table-column>
 
-        <!-- Học phí -->
-        <el-table-column prop="tuitionFee" label="Học phí" width="140" align="right">
-          <template #default="{ row }">
-            <span class="font-semibold text-gray-800">
-              {{ row.tuitionFee != null ? formatCurrency(row.tuitionFee) : '—' }}
-            </span>
-          </template>
-        </el-table-column>
+
 
         <!-- Kỹ năng yêu cầu -->
         <el-table-column prop="requiredSkillCode" label="Kỹ năng" width="120" align="center">
@@ -222,18 +215,6 @@
           <el-input-number v-model="currentCourse.durationWeeks" :min="1" class="w-full" />
         </el-form-item>
 
-        <!-- Học phí -->
-        <el-form-item label="Học phí (VNĐ)">
-          <el-input-number
-            v-model="currentCourse.tuitionFee"
-            :min="0"
-            :step="100000"
-            :formatter="(val: number) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-            :parser="(val: string) => Number(val.replace(/,/g, ''))"
-            class="w-full"
-          />
-        </el-form-item>
-
         <!-- Số học viên tối thiểu -->
         <el-form-item label="Sĩ số tối thiểu">
           <el-input-number v-model="currentCourse.minStudents" :min="1" class="w-full" />
@@ -322,7 +303,6 @@ const currentCourse = ref<Course>({
   durationWeeks: undefined,
   minStudents: undefined,
   maxStudents: undefined,
-  tuitionFee: undefined,
   requiredSkillCode: '',
   status: 'ACTIVE'
 });
@@ -397,7 +377,6 @@ const openDrawer = (course?: Course) => {
       durationWeeks: undefined,
       minStudents: undefined,
       maxStudents: undefined,
-      tuitionFee: undefined,
       requiredSkillCode: '',
       status: 'ACTIVE'
     };
@@ -473,10 +452,7 @@ const toggleStatus = async (course: Course) => {
 
 // ---- Helpers ----
 
-/** Format tiền tệ VND */
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-};
+
 
 /** Lấy loại tag theo trạng thái */
 const getStatusTagType = (status?: string) => {

@@ -34,7 +34,6 @@ export interface Course {
   durationWeeks?: number;      // Số tuần
   minStudents?: number;
   maxStudents?: number;
-  tuitionFee?: number;
   requiredSkillCode?: string;  // Kỹ năng GV cần có
   status?: string;             // ACTIVE, INACTIVE, DISCONTINUED
   // Legacy backward compat
