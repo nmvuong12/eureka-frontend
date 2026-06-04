@@ -137,9 +137,90 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <el-badge is-dot class="mt-1 mr-4">
-              <el-icon :size="24" class="text-gray-400 hover:text-primary-600 cursor-pointer"><Bell /></el-icon>
-            </el-badge>
+          <template v-if="authStore.isAdmin || authStore.isStaff">
+            <el-popover
+              placement="bottom-end"
+              :width="380"
+              trigger="click"
+              popper-class="notification-popover !p-0 !rounded-xl !shadow-2xl border-0"
+            >
+              <template #reference>
+                <el-badge :value="unreadCount" :max="99" :hidden="unreadCount === 0" class="mt-1 mr-4 cursor-pointer">
+                  <el-icon :size="24" class="text-gray-400 hover:text-emerald-600 transition-colors"><Bell /></el-icon>
+                </el-badge>
+              </template>
+              
+              <div class="flex flex-col">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-emerald-50/50 rounded-t-xl">
+                  <span class="font-bold text-gray-800 flex items-center gap-1.5">
+                    <el-icon class="text-emerald-500"><Bell /></el-icon>
+                    Thông báo hệ thống
+                  </span>
+                  <el-button 
+                    v-if="unreadCount > 0" 
+                    type="primary" 
+                    link 
+                    size="small" 
+                    class="!text-emerald-600 hover:!text-emerald-700 font-semibold"
+                    @click="handleReadAll"
+                  >
+                    Đọc tất cả
+                  </el-button>
+                </div>
+                
+                <!-- Notification list -->
+                <el-scrollbar max-height="350px">
+                  <div v-if="notifications.length > 0" class="py-1">
+                    <div 
+                      v-for="item in notifications" 
+                      :key="item.id" 
+                      class="px-4 py-3 hover:bg-gray-50 transition-all duration-200 flex gap-3 items-start border-b border-gray-50 last:border-b-0 cursor-pointer relative group"
+                      :class="{'bg-emerald-50/20 font-medium': !item.isRead}"
+                      @click="handleReadOne(item)"
+                    >
+                      <!-- Unread indicator dot -->
+                      <div class="mt-1.5 flex-shrink-0">
+                        <div 
+                          class="w-2 h-2 rounded-full transition-all duration-350" 
+                          :class="item.isRead ? 'bg-transparent' : 'bg-emerald-500 ring-4 ring-emerald-100'"
+                        ></div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm leading-snug text-gray-700" :class="{'text-gray-900 font-semibold': !item.isRead}">
+                          {{ item.message }}
+                        </p>
+                        <span class="text-xs text-gray-400 mt-1 block font-normal">
+                          {{ formatTime(item.createdAt) }}
+                        </span>
+                      </div>
+                      
+                      <!-- Inline mark as read button on hover -->
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 absolute right-4 top-1/2 -translate-y-1/2" v-if="!item.isRead">
+                        <el-button 
+                          type="success" 
+                          circle
+                          size="small"
+                          class="!bg-emerald-500 !border-emerald-500 hover:!bg-emerald-600 hover:!border-emerald-600 !p-1 shadow-sm"
+                          @click.stop="handleReadOne(item)"
+                        >
+                          <el-icon class="text-white"><Check /></el-icon>
+                        </el-button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div v-else class="py-12 flex flex-col items-center justify-center text-gray-400">
+                    <el-avatar :size="64" class="bg-gray-50 text-gray-300 mb-3">
+                      <el-icon :size="32"><Message /></el-icon>
+                    </el-avatar>
+                    <span class="text-sm font-medium">Không có thông báo mới</span>
+                    <span class="text-xs text-gray-400 mt-1 text-center px-6">Hệ thống sẽ đẩy thông báo khi có giáo viên gửi đơn nghỉ phép.</span>
+                  </div>
+                </el-scrollbar>
+              </div>
+            </el-popover>
+          </template>
 
             <el-dropdown @command="changeLanguage" trigger="click">
               <span class="el-dropdown-link cursor-pointer flex items-center gap-1 text-gray-600 hover:text-primary-600">
@@ -249,16 +330,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { 
   HomeFilled, User, Avatar, Reading, Location, Calendar, Document, SwitchButton, Fold, Expand, Bell, Refresh, ArrowDown, Lock,
-  Notebook, Collection, List, SetUp, Medal, Grid
+  Notebook, Collection, List, SetUp, Medal, Grid, Check, Message
 } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 import api from '@/api/axios';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -275,6 +356,188 @@ const passwordForm = reactive({
   oldPassword: '',
   newPassword: '',
   confirmNewPassword: ''
+});
+
+// State cho thông báo Web (SSE)
+const unreadCount = ref(0);
+const notifications = ref<any[]>([]);
+const sseInstance = ref<EventSource | null>(null);
+
+// Hàm phát tiếng beep thông báo nhẹ nhàng và chuyên nghiệp bằng Web Audio API
+const playNotificationSound = () => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Nốt nhạc thứ nhất (C5)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(523.25, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.25);
+    
+    // Nốt nhạc thứ hai (E5)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+    gain2.gain.setValueAtTime(0.08, ctx.currentTime + 0.08);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc2.start(ctx.currentTime + 0.08);
+    osc2.stop(ctx.currentTime + 0.35);
+  } catch (err) {
+    console.warn('Không thể phát âm thanh thông báo:', err);
+  }
+};
+
+// Lấy số lượng thông báo chưa đọc
+const fetchUnreadCount = async () => {
+  if (!authStore.isAuthenticated || (!authStore.isAdmin && !authStore.isStaff)) return;
+  try {
+    const res: any = await api.get('/notifications/unread-count');
+    if (res.success) {
+      unreadCount.value = res.data;
+    }
+  } catch (err) {
+    console.error('Lỗi lấy số lượng thông báo chưa đọc:', err);
+  }
+};
+
+// Lấy danh sách thông báo
+const fetchNotifications = async () => {
+  if (!authStore.isAuthenticated || (!authStore.isAdmin && !authStore.isStaff)) return;
+  try {
+    const res: any = await api.get('/notifications');
+    if (res.success) {
+      notifications.value = res.data;
+    }
+  } catch (err) {
+    console.error('Lỗi lấy danh sách thông báo:', err);
+  }
+};
+
+// Đọc toàn bộ thông báo
+const handleReadAll = async () => {
+  try {
+    const res: any = await api.post('/notifications/read-all');
+    if (res.success) {
+      notifications.value.forEach(item => item.isRead = true);
+      unreadCount.value = 0;
+      ElMessage.success('Đã đánh dấu đọc toàn bộ thông báo');
+    }
+  } catch (err) {
+    console.error('Lỗi khi đọc toàn bộ thông báo:', err);
+  }
+};
+
+// Đọc một thông báo cụ thể
+const handleReadOne = async (item: any) => {
+  if (item.isRead) return;
+  try {
+    const res: any = await api.post(`/notifications/${item.id}/read`);
+    if (res.success) {
+      item.isRead = true;
+      if (unreadCount.value > 0) {
+        unreadCount.value--;
+      }
+    }
+  } catch (err) {
+    console.error('Lỗi khi đọc thông báo:', err);
+  }
+};
+
+// Định dạng thời gian tương đối
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return '';
+  try {
+    const d = new Date(timeStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  } catch (e) {
+    return timeStr;
+  }
+};
+
+// Khởi tạo kết nối SSE
+const initSse = () => {
+  if (!authStore.token || (!authStore.isAdmin && !authStore.isStaff)) return;
+  
+  if (sseInstance.value) {
+    sseInstance.value.close();
+  }
+  
+  const token = authStore.token;
+  const sseUrl = `/api/notifications/subscribe?token=${encodeURIComponent(token)}`;
+  const sse = new EventSource(sseUrl);
+  sseInstance.value = sse;
+  
+  sse.addEventListener('NOTIFICATION', (e) => {
+    const message = e.data;
+    
+    // Phát âm thanh và thông báo Toast góc màn hình
+    playNotificationSound();
+    
+    ElNotification({
+      title: 'Thông báo hệ thống',
+      message: message,
+      type: 'success',
+      duration: 8000,
+      position: 'bottom-right'
+    });
+    
+    // Cập nhật lại số lượng và danh sách thông báo
+    fetchUnreadCount();
+    fetchNotifications();
+  });
+  
+  sse.addEventListener('INIT', (e) => {
+    console.log('SSE connection initialized:', e.data);
+  });
+  
+  sse.onerror = (err) => {
+    console.warn('SSE connection error, retrying in 10 seconds...', err);
+    sse.close();
+    setTimeout(() => {
+      if (authStore.isAuthenticated && (authStore.isAdmin || authStore.isStaff)) {
+        initSse();
+      }
+    }, 10000);
+  };
+};
+
+onMounted(() => {
+  if (authStore.isAdmin || authStore.isStaff) {
+    fetchUnreadCount();
+    fetchNotifications();
+    initSse();
+  }
+});
+
+onBeforeUnmount(() => {
+  if (sseInstance.value) {
+    sseInstance.value.close();
+  }
 });
 
 const toggleSidebar = () => {
