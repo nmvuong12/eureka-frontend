@@ -4,8 +4,8 @@ import { useToastStore } from '@/stores/toast';
 import router from '@/router';
 
 const api = axios.create({
-  baseURL: '/api',
-  timeout: 30000,
+    baseURL: import.meta.env.VITE_API_URL,
+    timeout: 30000,
 });
 
 api.interceptors.request.use(
