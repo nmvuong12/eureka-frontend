@@ -33,15 +33,15 @@
           <el-sub-menu index="courses-group">
             <template #title>
               <el-icon><Reading /></el-icon>
-              <span>Quản lý Khóa học</span>
+              <span>{{ $t('menu.courses_group') }}</span>
             </template>
             <el-menu-item index="/courses/catalog">
               <el-icon><Collection /></el-icon>
-              <template #title>Danh mục khóa học</template>
+              <template #title>{{ $t('menu.courses_catalog') }}</template>
             </el-menu-item>
             <el-menu-item index="/courses/batches">
               <el-icon><Calendar /></el-icon>
-              <template #title>Kế hoạch khai giảng</template>
+              <template #title>{{ $t('menu.courses_batches') }}</template>
             </el-menu-item>
           </el-sub-menu>
 
@@ -49,21 +49,21 @@
           <el-sub-menu index="classes-group">
             <template #title>
               <el-icon><Notebook /></el-icon>
-              <span>Quản lý Lớp học</span>
+              <span>{{ $t('menu.classes_group') }}</span>
             </template>
             <el-menu-item index="/classes/list">
               <el-icon><List /></el-icon>
-              <template #title>Danh sách lớp học</template>
+              <template #title>{{ $t('menu.classes_list') }}</template>
             </el-menu-item>
             <el-menu-item index="/classes/planning">
               <el-icon><SetUp /></el-icon>
-              <template #title>Lập kế hoạch mở lớp</template>
+              <template #title>{{ $t('menu.classes_planning') }}</template>
             </el-menu-item>
           </el-sub-menu>
 
           <el-menu-item index="/patterns">
             <el-icon><Calendar /></el-icon>
-            <template #title>Quản lý mẫu lịch</template>
+            <template #title>{{ $t('menu.patterns') }}</template>
           </el-menu-item>
 
           <el-menu-item index="/rooms">
@@ -76,7 +76,7 @@
           </el-menu-item>
           <el-menu-item index="/algorithm-config">
             <el-icon><SetUp /></el-icon>
-            <template #title>Cấu hình thuật toán</template>
+            <template #title>{{ $t('menu.algorithm_config') }}</template>
           </el-menu-item>
         </template>
 
@@ -84,7 +84,7 @@
         <el-sub-menu index="schedule-group">
           <template #title>
             <el-icon><Calendar /></el-icon>
-            <span>Quản lý Lịch giảng dạy</span>
+            <span>{{ $t('menu.schedule_group') }}</span>
           </template>
           <el-menu-item index="/timetable">
             <el-icon><Grid /></el-icon>
@@ -92,7 +92,7 @@
           </el-menu-item>
           <el-menu-item index="/classes/dispatch">
             <el-icon><Clock /></el-icon>
-            <template #title>Điều phối lịch giảng dạy</template>
+            <template #title>{{ $t('menu.schedule_dispatch') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
@@ -100,15 +100,15 @@
         <el-sub-menu index="teachers-group">
           <template #title>
             <el-icon><Avatar /></el-icon>
-            <span>Quản lý Giáo viên</span>
+            <span>{{ $t('menu.teachers_group') }}</span>
           </template>
           <el-menu-item v-if="authStore.isAdmin || authStore.isStaff" index="/teachers">
             <el-icon><List /></el-icon>
-            <template #title>Danh sách giáo viên</template>
+            <template #title>{{ $t('menu.teachers_list') }}</template>
           </el-menu-item>
           <el-menu-item index="/teacher-unavailable">
             <el-icon><CircleClose /></el-icon>
-            <template #title>Đăng ký lịch bận</template>
+            <template #title>{{ $t('menu.teachers_unavailable') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
@@ -155,7 +155,7 @@
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-emerald-50/50 rounded-t-xl">
                   <span class="font-bold text-gray-800 flex items-center gap-1.5">
                     <el-icon class="text-emerald-500"><Bell /></el-icon>
-                    Thông báo hệ thống
+                    {{ $t('notification.title') }}
                   </span>
                   <el-button 
                     v-if="unreadCount > 0" 
@@ -165,7 +165,7 @@
                     class="!text-emerald-600 hover:!text-emerald-700 font-semibold"
                     @click="handleReadAll"
                   >
-                    Đọc tất cả
+                    {{ $t('notification.read_all') }}
                   </el-button>
                 </div>
                 
@@ -214,8 +214,8 @@
                     <el-avatar :size="64" class="bg-gray-50 text-gray-300 mb-3">
                       <el-icon :size="32"><Message /></el-icon>
                     </el-avatar>
-                    <span class="text-sm font-medium">Không có thông báo mới</span>
-                    <span class="text-xs text-gray-400 mt-1 text-center px-6">Hệ thống sẽ đẩy thông báo khi có giáo viên gửi đơn nghỉ phép.</span>
+                    <span class="text-sm font-medium">{{ $t('notification.empty') }}</span>
+                    <span class="text-xs text-gray-400 mt-1 text-center px-6">{{ $t('notification.empty_desc') }}</span>
                   </div>
                 </el-scrollbar>
               </div>
@@ -431,7 +431,7 @@ const handleReadAll = async () => {
     if (res.success) {
       notifications.value.forEach(item => item.isRead = true);
       unreadCount.value = 0;
-      ElMessage.success('Đã đánh dấu đọc toàn bộ thông báo');
+      ElMessage.success(t('notification.marked_read'));
     }
   } catch (err) {
     console.error('Lỗi khi đọc toàn bộ thông báo:', err);
@@ -464,9 +464,9 @@ const formatTime = (timeStr: string) => {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffMins < 1) return t('notification.just_now');
+    if (diffMins < 60) return t('notification.mins_ago', { n: diffMins });
+    if (diffHours < 24) return t('notification.hours_ago', { n: diffHours });
     
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -499,7 +499,7 @@ const initSse = () => {
     playNotificationSound();
     
     ElNotification({
-      title: 'Thông báo hệ thống',
+      title: t('notification.title'),
       message: message,
       type: 'success',
       duration: 8000,

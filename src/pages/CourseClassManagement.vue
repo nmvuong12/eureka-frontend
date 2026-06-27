@@ -4,9 +4,9 @@
     <div class="pb-4 border-b border-gray-100">
       <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
         <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-        Quản lý Lớp & Khóa học
+        {{ $t('course_class.title') }}
       </h1>
-      <p class="text-sm text-gray-500 mt-1">Quản lý toàn bộ danh mục khóa học, phân bố số bài học và điều phối danh sách các lớp học hiện tại.</p>
+      <p class="text-sm text-gray-500 mt-1">{{ $t('course_class.desc') }}</p>
     </div>
 
     <!-- Courses Section -->
@@ -30,17 +30,17 @@
         </el-table-column>
         <el-table-column prop="totalLessons" :label="$t('course.lessons')" width="160">
           <template #default="{ row }">
-            <span class="font-semibold text-gray-700">{{ row.totalLessons }} bài học</span>
+            <span class="font-semibold text-gray-700">{{ $t('course_class.lessons_count', { count: row.totalLessons }) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="defaultDuration" :label="$t('course.duration')" width="160">
           <template #default="{ row }">
-            <span class="font-semibold text-gray-700">{{ row.defaultDuration }} phút/ca</span>
+            <span class="font-semibold text-gray-700">{{ $t('course_class.duration_count', { count: row.defaultDuration }) }}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
-            <el-tooltip content="Xem chi tiết" placement="top">
+            <el-tooltip :content="$t('common.view')" placement="top">
               <el-button type="info" link @click="openCourseModal(row, true)" class="hover:!text-blue-600">
                 <el-icon :size="16"><View /></el-icon>
               </el-button>
@@ -48,7 +48,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty description="Không có dữ liệu khóa học" />
+          <el-empty :description="$t('course_class.no_course_data')" />
         </template>
       </el-table>
     </el-card>
@@ -74,12 +74,12 @@
         </el-table-column>
         <el-table-column prop="courseId" :label="`${$t('course.name')} (ID)`" min-width="180">
           <template #default="{ row }">
-            <span class="text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-600">ID khóa học: #{{ row.courseId }}</span>
+            <span class="text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-600">{{ $t('course_class.course_id_label', { id: row.courseId }) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="studentSize" :label="$t('class.student_size')" width="160">
           <template #default="{ row }">
-            <span class="font-semibold text-gray-700">{{ row.studentSize }} học viên</span>
+            <span class="font-semibold text-gray-700">{{ $t('course_class.students_count', { count: row.studentSize }) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="startDate" :label="$t('class.start_date')" width="160">
@@ -90,13 +90,13 @@
         <el-table-column :label="$t('common.status')" width="130">
           <template #default="{ row }">
             <el-tag type="warning" effect="light" class="font-bold rounded-lg">
-              {{ row.status || 'Chưa bắt đầu' }}
+              {{ row.status || $t('course_class.not_started') }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
-            <el-tooltip content="Xem chi tiết" placement="top">
+            <el-tooltip :content="$t('common.view')" placement="top">
               <el-button type="info" link @click="openClassModal(row, true)" class="hover:!text-blue-600">
                 <el-icon :size="16"><View /></el-icon>
               </el-button>
@@ -104,7 +104,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty description="Không có dữ liệu lớp học" />
+          <el-empty :description="$t('course_class.no_class_data')" />
         </template>
       </el-table>
     </el-card>
@@ -120,7 +120,7 @@
     >
       <el-form :model="courseForm" label-position="top" :disabled="isViewOnlyCourse">
         <el-form-item :label="$t('course.name')" required>
-          <el-input v-model="courseForm.name" placeholder="Nhập tên khóa học..." />
+          <el-input v-model="courseForm.name" :placeholder="$t('course_class.placeholder_course_name')" />
         </el-form-item>
         <el-form-item :label="$t('course.lessons')" required>
           <el-input-number v-model="courseForm.totalLessons" :min="1" class="w-full font-semibold" />
@@ -129,7 +129,7 @@
           <el-input-number v-model="courseForm.defaultDuration" :min="1" class="w-full font-semibold" />
         </el-form-item>
         <el-form-item :label="$t('course.description')">
-          <el-input v-model="courseForm.description" type="textarea" :rows="4" placeholder="Nhập mô tả chi tiết khóa học..." />
+          <el-input v-model="courseForm.description" type="textarea" :rows="4" :placeholder="$t('course_class.placeholder_course_desc')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -141,7 +141,7 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button @click="showCourseModal = false">Hủy bỏ</el-button>
+            <el-button @click="showCourseModal = false">{{ $t('common.cancel') }}</el-button>
             <el-button type="primary" @click="saveCourse" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
               {{ $t('common.save') }}
             </el-button>
@@ -166,13 +166,13 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('class.name')" required>
-          <el-input v-model="classForm.name" placeholder="Nhập tên lớp học..." />
+          <el-input v-model="classForm.name" :placeholder="$t('course_class.placeholder_class_name')" />
         </el-form-item>
         <el-form-item :label="$t('class.student_size')" required>
           <el-input-number v-model="classForm.studentSize" :min="1" class="w-full font-semibold" />
         </el-form-item>
         <el-form-item :label="$t('class.start_date')" required>
-          <el-date-picker v-model="classForm.startDate" type="date" class="w-full" placeholder="Chọn ngày khai giảng..." format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
+          <el-date-picker v-model="classForm.startDate" type="date" class="w-full" :placeholder="$t('course_class.placeholder_start_date')" format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -184,7 +184,7 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button @click="showClassModal = false">Hủy bỏ</el-button>
+            <el-button @click="showClassModal = false">{{ $t('common.cancel') }}</el-button>
             <el-button type="primary" @click="saveClass" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
               {{ $t('common.save') }}
             </el-button>
@@ -231,7 +231,7 @@ const fetchData = async () => {
     courses.value = (resCourses as any).data;
     classes.value = (resClasses as any).data;
   } catch (err) {
-    ElMessage.error(t('common.error') || 'Có lỗi xảy ra khi tải dữ liệu');
+    ElMessage.error(t('course_class.error_load'));
   }
 };
 
@@ -247,7 +247,7 @@ const openCourseModal = (course?: Course, viewOnly: boolean = false) => {
 
 const saveCourse = async () => {
   if (!courseForm.value.name) {
-    ElMessage.warning('Tên khóa học không được bỏ trống');
+    ElMessage.warning(t('course_class.warn_course_name'));
     return;
   }
   try {
@@ -255,9 +255,9 @@ const saveCourse = async () => {
     if (res.success) {
       showCourseModal.value = false;
       fetchData();
-      ElMessage.success('Lưu thông tin khóa học thành công');
+      ElMessage.success(t('course_class.success_save_course'));
     } else {
-      ElMessage.error(res.message || 'Lưu thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err) {
     ElMessage.error(t('common.error'));
@@ -276,15 +276,15 @@ const openClassModal = (cls?: SchoolClass, viewOnly: boolean = false) => {
 
 const saveClass = async () => {
   if (!classForm.value.courseId) {
-    ElMessage.warning('Vui lòng chọn khóa học');
+    ElMessage.warning(t('course_class.warn_select_course'));
     return;
   }
   if (!classForm.value.name) {
-    ElMessage.warning('Tên lớp không được bỏ trống');
+    ElMessage.warning(t('course_class.warn_class_name'));
     return;
   }
   if (!classForm.value.startDate) {
-    ElMessage.warning('Vui lòng chọn ngày khai giảng');
+    ElMessage.warning(t('course_class.warn_select_start_date'));
     return;
   }
   try {
@@ -292,9 +292,9 @@ const saveClass = async () => {
     if (res.success) {
       showClassModal.value = false;
       fetchData();
-      ElMessage.success(t('class.create_success') || 'Tạo lớp học thành công');
+      ElMessage.success(t('class.create_success'));
     } else {
-      ElMessage.error(res.message || 'Lưu thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err) {
     ElMessage.error(t('common.error'));

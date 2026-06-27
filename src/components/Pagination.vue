@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
     <div class="flex items-center justify-between w-full">
       <div class="flex items-center gap-4">
-        <span class="text-sm text-gray-700">Hiển thị</span>
+        <span class="text-sm text-gray-700">{{ $t('common.show') }}</span>
         <select
           :value="modelValue"
           @input="$emit('update:modelValue', Number(($event.target as HTMLSelectElement).value))"
@@ -12,7 +12,7 @@
           <option :value="30">30</option>
           <option :value="50">50</option>
         </select>
-        <span class="text-sm text-gray-700">bản ghi</span>
+        <span class="text-sm text-gray-700">{{ $t('common.records') }}</span>
       </div>
       <div>
         <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -50,7 +50,7 @@
         </nav>
       </div>
       <div class="text-sm text-gray-700">
-        Tổng cộng <span class="font-medium">{{ total }}</span> bản ghi
+        {{ $t('common.total') }} <span class="font-medium">{{ total }}</span> {{ $t('common.records') }}
       </div>
     </div>
   </div>

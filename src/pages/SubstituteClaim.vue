@@ -7,23 +7,23 @@
 
       <!-- Loading State -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-12 space-y-4" v-loading="true">
-        <p class="text-sm text-gray-500">Đang kiểm tra thông tin lời mời dạy thay...</p>
+        <p class="text-sm text-gray-500">{{ $t('substitute.checking') }}</p>
       </div>
 
       <!-- Result States (Success / Already Claimed / Expired) -->
       <div v-else-if="claimSuccess" class="text-center py-6 space-y-6">
         <el-result
           icon="success"
-          title="Nhận ca Dạy thay Thành công!"
-          sub-title="Hệ thống đã tự động ghim lịch và cập nhật buổi dạy này vào lịch biểu cá nhân của thầy/cô."
+          :title="$t('substitute.success_title')"
+          :sub-title="$t('substitute.success_subtitle')"
         >
           <template #extra>
             <div class="space-y-4">
               <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-sm text-emerald-800 font-semibold">
-                Lớp: {{ offer?.classCode }} | Ca {{ offer?.timeslotLabel }} | Ngày {{ formatDate(offer?.sessionDate) }}
+                {{ $t('substitute.info_label', { class: offer?.classCode, slot: offer?.timeslotLabel, date: formatDate(offer?.sessionDate) }) }}
               </div>
               <el-button type="success" @click="goToDashboard" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 w-full rounded-xl">
-                Quay lại Trang chủ
+                {{ $t('substitute.back_home') }}
               </el-button>
             </div>
           </template>
@@ -33,12 +33,12 @@
       <div v-else-if="offer && offer.status !== 'PENDING'" class="text-center py-6 space-y-4">
         <el-result
           icon="warning"
-          title="Buổi dạy thay đã được nhận"
-          sub-title="Rất tiếc! Ca dạy thay này đã được một giáo viên khác nhanh tay xác nhận nhận trước."
+          :title="$t('substitute.claimed_title')"
+          :sub-title="$t('substitute.claimed_subtitle')"
         >
           <template #extra>
-            <p class="text-xs text-gray-400 mb-4">Cảm ơn sự nhiệt tình đóng góp và hỗ trợ giảng dạy của thầy/cô!</p>
-            <el-button @click="goToDashboard" class="w-full rounded-xl">Về Trang chủ</el-button>
+            <p class="text-xs text-gray-400 mb-4">{{ $t('substitute.claimed_thanks') }}</p>
+            <el-button @click="goToDashboard" class="w-full rounded-xl">{{ $t('substitute.back_home') }}</el-button>
           </template>
         </el-result>
       </div>
@@ -49,39 +49,39 @@
           <div class="inline-flex items-center justify-center p-3 bg-emerald-50 rounded-2xl text-emerald-600 border border-emerald-100 mb-2">
             <el-icon :size="28"><Clock /></el-icon>
           </div>
-          <h2 class="text-xl font-black text-gray-900">Xác nhận Dạy thay (FCFS)</h2>
-          <p class="text-xs text-gray-500">Mời thầy/cô nhận dạy thay cho đồng nghiệp gặp lịch bận đột xuất</p>
+          <h2 class="text-xl font-black text-gray-900">{{ $t('substitute.confirm_title') }}</h2>
+          <p class="text-xs text-gray-500">{{ $t('substitute.confirm_subtitle') }}</p>
         </div>
 
         <div class="border-t border-b border-gray-100 py-4 space-y-3.5 text-sm">
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Lớp học:</span>
+            <span class="text-gray-400">{{ $t('substitute.class') }}</span>
             <span class="font-bold text-gray-800">{{ offer.classCode }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Buổi học:</span>
-            <span class="font-bold text-gray-800">Buổi số #{{ offer.lessonIndex }}</span>
+            <span class="text-gray-400">{{ $t('substitute.lesson') }}</span>
+            <span class="font-bold text-gray-800">{{ $t('substitute.lesson_index', { index: offer.lessonIndex }) }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Ngày dạy thay:</span>
+            <span class="text-gray-400">{{ $t('substitute.date') }}</span>
             <span class="font-bold text-gray-800 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{{ formatDate(offer.sessionDate) }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Ca học:</span>
+            <span class="text-gray-400">{{ $t('substitute.timeslot') }}</span>
             <span class="font-bold text-gray-800">{{ offer.timeslotLabel }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Kỹ năng buổi dạy:</span>
+            <span class="text-gray-400">{{ $t('substitute.skill') }}</span>
             <el-tag size="small" type="danger" effect="plain" class="font-bold rounded">{{ offer.requiredSkill }}</el-tag>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-400">Giáo viên gốc:</span>
+            <span class="text-gray-400">{{ $t('substitute.original_teacher') }}</span>
             <span class="text-gray-600 font-medium">{{ offer.originalTeacherName }}</span>
           </div>
         </div>
 
         <el-alert
-          title="Đây là hệ thống Dạy thay Tự động FCFS (Ai nhận trước được ca dạy). Thầy cô vui lòng click nút bên dưới để chốt nhận ca dạy."
+          :title="$t('substitute.help_text')"
           type="info"
           :closable="false"
           class="rounded-xl border border-blue-100"
@@ -94,10 +94,10 @@
             :loading="claiming"
             class="w-full !py-6 !bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 !border-0 text-base font-bold shadow-lg shadow-emerald-500/20 transition-all duration-300 rounded-xl"
           >
-            Đồng ý nhận Dạy thay ngay
+            {{ $t('substitute.accept_btn') }}
           </el-button>
           <el-button @click="goToDashboard" class="w-full !py-6 rounded-xl hover:text-gray-700">
-            Từ chối & Về trang chủ
+            {{ $t('substitute.reject_btn') }}
           </el-button>
         </div>
       </div>
@@ -106,11 +106,11 @@
       <div v-else class="text-center py-6 space-y-4">
         <el-result
           icon="error"
-          title="Không tìm thấy lời mời"
-          sub-title="Mã liên kết dạy thay không tồn tại, đã hết hạn hoặc không hợp lệ."
+          :title="$t('substitute.not_found_title')"
+          :sub-title="$t('substitute.not_found_subtitle')"
         >
           <template #extra>
-            <el-button @click="goToDashboard" class="w-full rounded-xl">Quay lại Trang chủ</el-button>
+            <el-button @click="goToDashboard" class="w-full rounded-xl">{{ $t('substitute.back_home') }}</el-button>
           </template>
         </el-result>
       </div>
@@ -124,9 +124,11 @@ import { useRoute, useRouter } from 'vue-router';
 import api from '@/api/axios';
 import { Clock } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const loading = ref(true);
 const claiming = ref(false);
@@ -165,12 +167,12 @@ const claimOffer = async () => {
     const res: any = await api.post(`/timetable/substitute/claim?token=${token.value}`);
     if (res.success) {
       claimSuccess.value = true;
-      ElMessage.success('Xác nhận nhận dạy thay thành công!');
+      ElMessage.success(t('common.success'));
     } else {
-      ElMessage.error(res.message || 'Xác nhận dạy thay thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi xác nhận dạy thay');
+    ElMessage.error(err.response?.data?.message || t('common.error'));
   } finally {
     claiming.value = false;
   }

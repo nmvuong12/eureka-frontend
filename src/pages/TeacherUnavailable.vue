@@ -5,10 +5,10 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-b from-red-500 to-rose-600 w-2.5 h-8 rounded-full"></span>
-          Đăng ký Lịch bận Cố định
+          {{ $t('teacher.busy_title') }}
         </h1>
         <p class="text-sm text-gray-500 mt-1">
-          Thiết lập các ca học bận cố định trong tuần. Thuật toán xếp lịch tự động sẽ né chính xác các ca này để tránh trùng lịch.
+          {{ $t('teacher.busy_desc') }}
         </p>
       </div>
 
@@ -21,7 +21,7 @@
         class="!bg-rose-600 hover:!bg-rose-700 !border-rose-600 shadow-md font-bold transition-all duration-300 transform hover:scale-105"
       >
         <el-icon class="mr-1.5"><DocumentChecked /></el-icon>
-        Lưu lịch bận cố định
+        {{ $t('teacher.busy_save') }}
       </el-button>
     </div>
 
@@ -34,11 +34,11 @@
     >
       <div class="flex flex-col sm:flex-row sm:items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-bold text-gray-700">Chọn giáo viên cần thiết lập:</span>
+          <span class="text-sm font-bold text-gray-700">{{ $t('teacher.busy_select') }}</span>
         </div>
         <el-select
           v-model="selectedTeacherId"
-          placeholder="Tìm kiếm hoặc chọn giáo viên..."
+          :placeholder="$t('teacher.busy_select_placeholder')"
           filterable
           clearable
           class="min-w-[280px]"
@@ -61,15 +61,15 @@
       <div class="flex flex-wrap items-center gap-6 text-sm bg-white p-4 border border-gray-100 rounded-xl">
         <div class="flex items-center gap-2">
           <span class="w-4 h-4 bg-emerald-50 border border-emerald-200 rounded-md"></span>
-          <span class="text-gray-600 font-medium">Sẵn sàng giảng dạy (Free)</span>
+          <span class="text-gray-600 font-medium">{{ $t('teacher.busy_free') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-4 h-4 bg-rose-50 border border-rose-200 rounded-md flex items-center justify-center text-rose-500 text-[10px] font-bold">✕</span>
-          <span class="text-gray-600 font-medium">Bận cố định (Busy) - *Solver sẽ né ca này*</span>
+          <span class="text-gray-600 font-medium">{{ $t('teacher.busy_busy') }}</span>
         </div>
         <div class="text-xs text-slate-400 ml-auto flex items-center gap-1.5">
           <el-icon><InfoFilled /></el-icon>
-          Click vào từng ô ca học bên dưới để bật/tắt (toggle) lịch bận
+          {{ $t('teacher.busy_toggle_help') }}
         </div>
       </div>
 
@@ -80,7 +80,7 @@
             <thead>
               <tr class="bg-slate-50 border-b border-slate-100">
                 <th class="p-4 w-32 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Ca / Thứ
+                  {{ $t('teacher.busy_slot_day') }}
                 </th>
                 <th
                   v-for="day in daysOfWeek"
@@ -99,7 +99,7 @@
               >
                 <!-- Row Header: Timeslot Index & Time -->
                 <td class="p-3 text-center bg-slate-50/30">
-                  <div class="font-bold text-gray-800 text-sm">Ca {{ slotIndex }}</div>
+                  <div class="font-bold text-gray-800 text-sm">{{ $t('timetable.ca') }} {{ slotIndex }}</div>
                   <div class="text-[11px] text-gray-400 font-semibold mt-0.5">
                     {{ getSlotTimeRange(slotIndex) }}
                   </div>
@@ -138,17 +138,17 @@
                         <CircleCloseFilled v-if="isUnavailable(getTimeslot(day.code, slotIndex).id)" class="text-rose-600 animate-pulse" />
                         <CircleCheckFilled v-else class="text-emerald-500" />
                       </el-icon>
-                      <span>{{ isUnavailable(getTimeslot(day.code, slotIndex).id) ? 'BẬN' : 'RẢNH' }}</span>
+                      <span>{{ isUnavailable(getTimeslot(day.code, slotIndex).id) ? $t('teacher.busy_label_busy') : $t('teacher.busy_label_free') }}</span>
                     </div>
 
                     <!-- Short Label / Code -->
                     <div class="text-[10px] opacity-60 font-semibold mt-1 uppercase">
-                      {{ day.label }} - Ca {{ slotIndex }}
+                      {{ day.label }} - {{ $t('timetable.ca') }} {{ slotIndex }}
                     </div>
 
                     <!-- Tooltip Indicator on hover -->
                     <div class="absolute bottom-1 right-2 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity font-bold uppercase text-slate-400">
-                      Click để đổi
+                      {{ $t('teacher.busy_click_to_change') }}
                     </div>
                   </div>
 
@@ -157,7 +157,7 @@
                     v-else
                     class="h-20 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 text-xs font-medium cursor-not-allowed"
                   >
-                    Không có ca
+                    {{ $t('teacher.busy_no_slots') }}
                   </div>
                 </td>
               </tr>
@@ -176,16 +176,16 @@
           class="!bg-rose-600 hover:!bg-rose-700 !border-rose-600 shadow-lg px-8 font-bold transition-all duration-300 transform hover:scale-105"
         >
           <el-icon class="mr-1.5"><DocumentChecked /></el-icon>
-          Xác nhận & Lưu lịch bận cố định
+          {{ $t('teacher.busy_confirm_save') }}
         </el-button>
       </div>
     </div>
 
     <!-- Empty State when no teacher selected -->
     <div v-else class="flex flex-col items-center justify-center p-20 bg-white border border-gray-100 rounded-3xl shadow-sm text-center">
-      <el-empty description="Vui lòng chọn giáo viên để đăng ký hoặc cấu hình lịch bận">
+      <el-empty :description="$t('teacher.busy_empty_desc')">
         <div class="text-sm text-slate-400 max-w-sm mt-2 leading-relaxed">
-          Nếu đăng nhập bằng tài khoản Giáo viên, lịch bận cá nhân sẽ tự động hiển thị. Nếu là Admin hoặc Giáo vụ, vui lòng chọn một giáo viên từ ô chọn phía trên.
+          {{ $t('teacher.busy_empty_detail') }}
         </div>
       </el-empty>
     </div>
@@ -193,14 +193,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import api from '@/api/axios';
 import { ElMessage } from 'element-plus';
 import { DocumentChecked, InfoFilled, CircleCloseFilled, CircleCheckFilled } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
 
 // Auth store
 const authStore = useAuthStore();
+const { t } = useI18n();
 
 // UI States
 const loading = ref(false);
@@ -213,16 +215,16 @@ const selectedTeacherId = ref<number | null>(null);
 const timeslots = ref<any[]>([]);
 const unavailableTimeslotIds = ref<number[]>([]);
 
-// Week Days Definition
-const daysOfWeek = [
-  { code: 'MONDAY', label: 'Thứ 2' },
-  { code: 'TUESDAY', label: 'Thứ 3' },
-  { code: 'WEDNESDAY', label: 'Thứ 4' },
-  { code: 'THURSDAY', label: 'Thứ 5' },
-  { code: 'FRIDAY', label: 'Thứ 6' },
-  { code: 'SATURDAY', label: 'Thứ 7' },
-  { code: 'SUNDAY', label: 'Chủ Nhật' }
-];
+// Week Days Definition computed dynamically
+const daysOfWeek = computed(() => [
+  { code: 'MONDAY', label: t('timetable.mon') },
+  { code: 'TUESDAY', label: t('timetable.tue') },
+  { code: 'WEDNESDAY', label: t('timetable.wed') },
+  { code: 'THURSDAY', label: t('timetable.thu') },
+  { code: 'FRIDAY', label: t('timetable.fri') },
+  { code: 'SATURDAY', label: t('timetable.sat') },
+  { code: 'SUNDAY', label: t('timetable.sun') }
+]);
 
 /** Ca học tiêu chuẩn theo số thứ tự (Slot Index) */
 const getSlotTimeRange = (index: number) => {
@@ -289,7 +291,7 @@ const fetchTeachers = async () => {
       teachers.value = res.data;
     }
   } catch (err) {
-    ElMessage.error('Không thể lấy danh sách giáo viên');
+    ElMessage.error(t('teacher.busy_error_load_teachers'));
   } finally {
     teachersLoading.value = false;
   }
@@ -303,7 +305,7 @@ const fetchTimeslots = async () => {
       timeslots.value = res.data;
     }
   } catch (err) {
-    ElMessage.error('Không thể lấy cấu hình các ca học');
+    ElMessage.error(t('teacher.busy_error_load_slots'));
   }
 };
 
@@ -316,7 +318,7 @@ const fetchUnavailableTimeslots = async (teacherId: number) => {
       unavailableTimeslotIds.value = res.data;
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Không thể lấy lịch bận cố định của giáo viên này');
+    ElMessage.error(err.response?.data?.message || t('teacher.busy_error_load_schedule'));
   } finally {
     loading.value = false;
   }
@@ -325,7 +327,7 @@ const fetchUnavailableTimeslots = async (teacherId: number) => {
 /** Lưu lịch bận cố định lên Backend */
 const handleSave = async () => {
   if (!selectedTeacherId.value) {
-    ElMessage.warning('Vui lòng chọn giáo viên để thực hiện lưu.');
+    ElMessage.warning(t('teacher.busy_select'));
     return;
   }
 
@@ -335,12 +337,12 @@ const handleSave = async () => {
       timeslotIds: unavailableTimeslotIds.value
     });
     if (res.success) {
-      ElMessage.success('Đã cập nhật lịch bận cố định của giáo viên thành công!');
+      ElMessage.success(t('teacher.busy_save_success'));
       // Tải lại để đảm bảo dữ liệu hiển thị đồng bộ
       fetchUnavailableTimeslots(selectedTeacherId.value);
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Lỗi khi cập nhật lịch bận cố định');
+    ElMessage.error(err.response?.data?.message || t('teacher.busy_save_failed'));
   } finally {
     saving.value = false;
   }

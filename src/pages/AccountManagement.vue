@@ -7,7 +7,7 @@
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
           {{ $t('account.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản người dùng, phân quyền truy cập hệ thống và thông tin chi tiết.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('account.description') }}</p>
       </div>
       <el-button type="primary" @click="openModal()" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300">
         <el-icon class="mr-1"><Plus /></el-icon>
@@ -20,7 +20,7 @@
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
           <el-icon class="text-emerald-500"><Search /></el-icon>
-          Bộ lọc nâng cao
+          {{ $t('common.filter_advanced') }}
         </h2>
         <div class="flex items-center gap-2">
           <el-button type="primary" @click="handleSearch" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
@@ -109,12 +109,12 @@
         <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex items-center gap-1">
-              <el-tooltip content="Xem chi tiết" placement="top">
+              <el-tooltip :content="$t('account.tooltip_detail')" placement="top">
                 <el-button type="info" link @click="openModal(row, true)" class="hover:!text-blue-600">
                   <el-icon :size="16"><View /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="Xóa tài khoản" placement="top">
+              <el-tooltip :content="$t('account.tooltip_delete')" placement="top">
                 <el-button type="danger" link @click="deleteUser(row.id)" class="hover:!text-red-600">
                   <el-icon :size="16"><Delete /></el-icon>
                 </el-button>
@@ -129,7 +129,7 @@
       
       <!-- Pagination Footer -->
       <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50">
-        <div class="text-xs text-gray-500">Hiển thị trang {{ currentPage }} / tổng số {{ totalElements }} tài khoản.</div>
+        <div class="text-xs text-gray-500">{{ $t('common.show') }} {{ currentPage }} / {{ totalElements }}</div>
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="itemsPerPage"
@@ -362,7 +362,7 @@ const saveUser = async () => {
   }
 
   if (form.value.role === 'TEACHER' && !form.value.teacherId) {
-    ElMessage.error('Vui lòng chọn giáo viên');
+    ElMessage.error(t('account.select_teacher_warn'));
     return;
   }
 
@@ -374,7 +374,7 @@ const saveUser = async () => {
       res = await api.post('/accounts', form.value);
     }
     if (res.success) {
-      ElMessage.success(res.message || 'Lưu tài khoản thành công');
+      ElMessage.success(res.message || t('account.save_success'));
       showModal.value = false;
       fetchData();
     }

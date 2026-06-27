@@ -5,10 +5,10 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-          Quản lý Mẫu Lịch Học
+          {{ $t('pattern.title') }}
         </h1>
         <p class="text-sm text-gray-500 mt-1">
-          Thiết lập và quản lý các mẫu lịch học tuần tiêu chuẩn (Schedule Patterns) phục vụ tuyển sinh, mở lớp và xếp lịch tự động.
+          {{ $t('pattern.desc') }}
         </p>
       </div>
       
@@ -18,51 +18,51 @@
         class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md flex items-center gap-1 font-bold"
       >
         <el-icon><Plus /></el-icon>
-        Thêm Mẫu Lịch
+        {{ $t('pattern.btn_add') }}
       </el-button>
     </div>
 
     <!-- Filter & Search Bar -->
-    <div class="bg-white p-4 rounded-2xl border border-gray-150 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+    <div class="bg-white p-4 rounded-2xl border border-gray-155 shadow-sm flex flex-wrap gap-4 items-center justify-between">
       <div class="flex flex-wrap gap-3 items-center">
         <el-input
           v-model="searchQuery"
-          placeholder="Tìm mã mẫu (P001...)"
+          :placeholder="$t('pattern.search_placeholder')"
           class="!w-60 search-input"
           clearable
           :prefix-icon="Search"
         />
-        <el-select v-model="filterSlot" placeholder="Lọc theo Ca học" clearable class="!w-40">
+        <el-select v-model="filterSlot" :placeholder="$t('pattern.filter_slot')" clearable class="!w-40">
           <el-option 
             v-for="opt in slotOptions" 
             :key="opt.value" 
-            :label="opt.value.startsWith('C') ? 'Ca ' + opt.value.substring(1) : 'Ca ' + opt.value" 
+            :label="opt.value.startsWith('C') ? $t('timetable.ca') + ' ' + opt.value.substring(1) : $t('timetable.ca') + ' ' + opt.value" 
             :value="opt.value" 
           />
         </el-select>
-        <el-select v-model="filterSessions" placeholder="Số buổi / tuần" clearable class="!w-44">
-          <el-option label="2 buổi/tuần" :value="2" />
-          <el-option label="3 buổi/tuần" :value="3" />
-          <el-option label="4 buổi/tuần" :value="4" />
+        <el-select v-model="filterSessions" :placeholder="$t('pattern.filter_sessions')" clearable class="!w-44">
+          <el-option :label="$t('pattern.sessions_per_week_label', { count: 2 })" :value="2" />
+          <el-option :label="$t('pattern.sessions_per_week_label', { count: 3 })" :value="3" />
+          <el-option :label="$t('pattern.sessions_per_week_label', { count: 4 })" :value="4" />
         </el-select>
       </div>
 
       <el-button @click="resetFilters" plain class="hover:!bg-gray-50">
         <el-icon class="mr-1"><Refresh /></el-icon>
-        Đặt lại bộ lọc
+        {{ $t('pattern.btn_reset') }}
       </el-button>
     </div>
 
     <!-- Data Table -->
-    <el-card class="border border-gray-150 rounded-2xl shadow-sm" v-loading="loading">
+    <el-card class="border border-gray-155 rounded-2xl shadow-sm" v-loading="loading">
       <el-table :data="filteredPatterns" style="width: 100%" class="premium-table">
-        <el-table-column prop="code" label="Mã Mẫu" width="110" align="center">
+        <el-table-column prop="code" :label="$t('pattern.col_code')" width="110" align="center">
           <template #default="{ row }">
             <span class="font-bold text-gray-900">{{ row.code }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Ngày học trong tuần" min-width="200">
+        <el-table-column :label="$t('pattern.col_study_days')" min-width="200">
           <template #default="{ row }">
             <div class="flex flex-wrap gap-1.5">
               <el-tag 
@@ -78,29 +78,29 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="slotCode" label="Ca học" width="110" align="center">
+        <el-table-column prop="slotCode" :label="$t('pattern.col_slot')" width="110" align="center">
           <template #default="{ row }">
             <el-tag size="small" type="info" class="!bg-teal-50 !text-teal-700 !border-teal-100 font-bold">
-              Ca {{ row.slotCode }}
+              {{ $t('timetable.ca') }} {{ row.slotCode.startsWith('C') ? row.slotCode.substring(1) : row.slotCode }}
             </el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="Khung giờ học" width="180" align="center">
+        <el-table-column :label="$t('pattern.col_time')" width="180" align="center">
           <template #default="{ row }">
             <span class="font-medium text-gray-700">{{ row.slotStart }} - {{ row.slotEnd }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="sessionsPerWeek" label="Số buổi / Tuần" width="150" align="center">
+        <el-table-column prop="sessionsPerWeek" :label="$t('pattern.col_sessions')" width="150" align="center">
           <template #default="{ row }">
             <el-tag size="small" class="!bg-emerald-50 !text-emerald-700 !border-emerald-100 font-bold">
-              {{ row.sessionsPerWeek }} buổi
+              {{ $t('pattern.col_sessions_val', { count: row.sessionsPerWeek }) }}
             </el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="Trạng thái" width="130" align="center">
+        <el-table-column :label="$t('pattern.col_status')" width="130" align="center">
           <template #default="{ row }">
             <el-switch
               v-model="row.active"
@@ -111,15 +111,15 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="Thao tác" width="160" align="center" fixed="right">
+        <el-table-column :label="$t('pattern.col_actions')" width="160" align="center" fixed="right">
           <template #default="{ row }">
             <div class="flex justify-center gap-2">
-              <el-tooltip content="Chỉnh sửa" placement="top">
+              <el-tooltip :content="$t('pattern.tooltip_edit')" placement="top">
                 <el-button type="primary" link @click="openEditDialog(row)" class="hover:!text-emerald-600">
                   <el-icon :size="16"><Edit /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="Xóa mẫu lịch" placement="top">
+              <el-tooltip :content="$t('pattern.tooltip_delete')" placement="top">
                 <el-button type="danger" link @click="handleDelete(row)" class="hover:!text-red-600">
                   <el-icon :size="16"><Delete /></el-icon>
                 </el-button>
@@ -133,7 +133,7 @@
     <!-- Dialog Thêm / Sửa -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? 'Chỉnh sửa Mẫu Lịch Học' : 'Thêm Mẫu Lịch Học Mới'"
+      :title="isEdit ? $t('pattern.dialog_title_edit') : $t('pattern.dialog_title_create')"
       width="500px"
       destroy-on-close
       custom-class="premium-dialog"
@@ -147,28 +147,28 @@
       >
         <!-- Tự sinh mã code -->
         <div v-if="!isEdit" class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex justify-between items-center mb-2">
-          <span class="text-xs text-gray-500 font-medium">Mã mẫu dự kiến tự sinh:</span>
+          <span class="text-xs text-gray-500 font-medium">{{ $t('pattern.form_code_help') }}</span>
           <span class="text-sm font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">{{ nextCodeSuggestion }}</span>
         </div>
 
         <!-- Chọn các ngày học -->
-        <el-form-item label="Ngày học trong tuần (chọn tối đa các ngày trong tuần)" prop="studyDaysList" required>
+        <el-form-item :label="$t('pattern.form_study_days')" prop="studyDaysList" required>
           <el-checkbox-group v-model="form.studyDaysList" class="flex flex-wrap gap-2.5 mt-1">
-            <el-checkbox-button label="2">T2</el-checkbox-button>
-            <el-checkbox-button label="3">T3</el-checkbox-button>
-            <el-checkbox-button label="4">T4</el-checkbox-button>
-            <el-checkbox-button label="5">T5</el-checkbox-button>
-            <el-checkbox-button label="6">T6</el-checkbox-button>
-            <el-checkbox-button label="7">T7</el-checkbox-button>
-            <el-checkbox-button label="1">CN</el-checkbox-button>
+            <el-checkbox-button label="2">{{ $t('dashboard.mon') }}</el-checkbox-button>
+            <el-checkbox-button label="3">{{ $t('dashboard.tue') }}</el-checkbox-button>
+            <el-checkbox-button label="4">{{ $t('dashboard.wed') }}</el-checkbox-button>
+            <el-checkbox-button label="5">{{ $t('dashboard.thu') }}</el-checkbox-button>
+            <el-checkbox-button label="6">{{ $t('dashboard.fri') }}</el-checkbox-button>
+            <el-checkbox-button label="7">{{ $t('dashboard.sat') }}</el-checkbox-button>
+            <el-checkbox-button label="1">{{ $t('dashboard.sun') }}</el-checkbox-button>
           </el-checkbox-group>
         </el-form-item>
 
         <!-- Ca học -->
-        <el-form-item label="Ca học chuẩn" prop="slotCode" required>
+        <el-form-item :label="$t('pattern.form_slot')" prop="slotCode" required>
           <el-select 
             v-model="form.slotCode" 
-            placeholder="Chọn ca học" 
+            :placeholder="$t('pattern.form_slot_placeholder')" 
             class="w-full"
             @change="handleSlotChange"
           >
@@ -183,30 +183,30 @@
 
         <!-- Khung giờ bắt đầu & kết thúc -->
         <div class="grid grid-cols-2 gap-4">
-          <el-form-item label="Giờ bắt đầu" prop="slotStart">
+          <el-form-item :label="$t('pattern.form_start')" prop="slotStart">
             <el-input
               v-model="form.slotStart"
-              placeholder="Tự động điền theo ca"
+              :placeholder="$t('pattern.form_start_placeholder')"
               disabled
             />
           </el-form-item>
-          <el-form-item label="Giờ kết thúc" prop="slotEnd">
+          <el-form-item :label="$t('pattern.form_end')" prop="slotEnd">
             <el-input
               v-model="form.slotEnd"
-              placeholder="Tự động điền theo ca"
+              :placeholder="$t('pattern.form_end_placeholder')"
               disabled
             />
           </el-form-item>
         </div>
 
         <!-- Số buổi học trên tuần (Tự động tính theo số ngày đã chọn) -->
-        <el-form-item label="Số buổi học mỗi tuần">
+        <el-form-item :label="$t('pattern.form_sessions_week')">
           <div class="flex items-center gap-3">
             <el-tag size="large" type="success" class="font-extrabold !px-4">
-              {{ form.studyDaysList.length }} buổi/tuần
+              {{ $t('pattern.form_sessions_week_val', { count: form.studyDaysList.length }) }}
             </el-tag>
             <span class="text-xs text-gray-400">
-              (Được tính tự động dựa trên số ngày học đã chọn ở trên)
+              {{ $t('pattern.form_sessions_week_help') }}
             </span>
           </div>
         </el-form-item>
@@ -214,14 +214,14 @@
 
       <template #footer>
         <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
-          <el-button @click="dialogVisible = false">Hủy bỏ</el-button>
+          <el-button @click="dialogVisible = false">{{ $t('pattern.form_cancel') }}</el-button>
           <el-button 
             type="primary" 
             @click="handleSubmit" 
             :loading="submitting"
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 font-bold"
           >
-            Lưu Lịch
+            {{ $t('pattern.form_save') }}
           </el-button>
         </div>
       </template>
@@ -231,10 +231,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '@/api/axios';
 import { Plus, Edit, Delete, Search, Refresh } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
+
+const { t } = useI18n();
 
 interface SchedulePattern {
   id: number;
@@ -274,20 +277,20 @@ const form = reactive({
 });
 
 // Quy tắc Validate Form
-const rules = reactive<FormRules>({
+const rules = computed<FormRules>(() => ({
   studyDaysList: [
-    { type: 'array', required: true, message: 'Vui lòng chọn ít nhất 1 ngày học trong tuần', trigger: 'change' }
+    { type: 'array', required: true, message: t('pattern.rule_days_required'), trigger: 'change' }
   ],
   slotCode: [
-    { required: true, message: 'Vui lòng chọn ca học chuẩn', trigger: 'change' }
+    { required: true, message: t('pattern.rule_slot_required'), trigger: 'change' }
   ],
   slotStart: [
-    { required: true, message: 'Giờ bắt đầu là bắt buộc', trigger: 'change' }
+    { required: true, message: t('pattern.rule_start_required'), trigger: 'change' }
   ],
   slotEnd: [
-    { required: true, message: 'Giờ kết thúc là bắt buộc', trigger: 'change' }
+    { required: true, message: t('pattern.rule_end_required'), trigger: 'change' }
   ]
-});
+}));
 
 // Tải danh sách Timeslot từ database
 const fetchTimeslots = async () => {
@@ -295,7 +298,7 @@ const fetchTimeslots = async () => {
     const res: any = await api.get('/timeslots');
     timeslots.value = res.data || [];
   } catch (err) {
-    ElMessage.error('Có lỗi xảy ra khi tải danh sách ca học');
+    ElMessage.error(t('pattern.error_load_slots'));
   }
 };
 
@@ -358,13 +361,13 @@ const getDayTagType = (day: string) => {
 // Chuyển số sang chữ thứ thân thiện
 const getDayLabel = (day: string) => {
   switch (day) {
-    case '1': return 'CN';
-    case '2': return 'T2';
-    case '3': return 'T3';
-    case '4': return 'T4';
-    case '5': return 'T5';
-    case '6': return 'T6';
-    case '7': return 'T7';
+    case '1': return t('dashboard.sun');
+    case '2': return t('dashboard.mon');
+    case '3': return t('dashboard.tue');
+    case '4': return t('dashboard.wed');
+    case '5': return t('dashboard.thu');
+    case '6': return t('dashboard.fri');
+    case '7': return t('dashboard.sat');
     default: return 'T' + day;
   }
 };
@@ -379,7 +382,7 @@ const fetchPatterns = async () => {
       calculateNextCodeSuggestion();
     }
   } catch (err) {
-    ElMessage.error('Có lỗi xảy ra khi tải danh sách mẫu lịch');
+    ElMessage.error(t('pattern.error_load_patterns'));
   } finally {
     loading.value = false;
   }
@@ -476,14 +479,14 @@ const handleSubmit = async () => {
         }
 
         if (res.success) {
-          ElMessage.success(isEdit.value ? 'Cập nhật mẫu lịch học thành công!' : 'Tạo mới mẫu lịch học thành công!');
+          ElMessage.success(isEdit.value ? t('pattern.success_save_edit') : t('pattern.success_save_create'));
           dialogVisible.value = false;
           fetchPatterns();
         } else {
-          ElMessage.error(res.message || 'Lưu thất bại');
+          ElMessage.error(res.message || t('pattern.error_save'));
         }
       } catch (err: any) {
-        ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi lưu mẫu lịch học');
+        ElMessage.error(err.response?.data?.message || t('pattern.error_save_system'));
       } finally {
         submitting.value = false;
       }
@@ -496,38 +499,38 @@ const handleToggleActive = async (row: SchedulePattern, val: boolean) => {
   try {
     const res: any = await api.put(`/class-planning/patterns/${row.id}/toggle?active=${val}`);
     if (res.success) {
-      ElMessage.success(val ? `Kích hoạt mẫu ${row.code} thành công!` : `Tạm khóa mẫu ${row.code} thành công!`);
+      ElMessage.success(val ? t('pattern.success_status_active', { code: row.code }) : t('pattern.success_status_inactive', { code: row.code }));
     } else {
       row.active = !val; // revert if failed
-      ElMessage.error(res.message || 'Không thể thay đổi trạng thái');
+      ElMessage.error(res.message || t('pattern.error_status'));
     }
   } catch (err: any) {
     row.active = !val; // revert on error
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi thay đổi trạng thái');
+    ElMessage.error(err.response?.data?.message || t('pattern.error_status_system'));
   }
 };
 
 // Xóa mẫu lịch
 const handleDelete = (row: SchedulePattern) => {
   ElMessageBox.confirm(
-    `Bạn có chắc chắn muốn xóa mẫu lịch học '${row.code}' này không? Thao tác này không thể hoàn tác.`,
-    'Xác nhận xóa',
+    t('pattern.delete_confirm_text', { code: row.code }),
+    t('pattern.delete_confirm_title'),
     {
-      confirmButtonText: 'Đồng ý xóa',
-      cancelButtonText: 'Hủy bỏ',
+      confirmButtonText: t('pattern.delete_confirm_btn'),
+      cancelButtonText: t('pattern.delete_confirm_cancel'),
       type: 'warning'
     }
   ).then(async () => {
     try {
       const res: any = await api.delete(`/class-planning/patterns/${row.id}`);
       if (res.success) {
-        ElMessage.success(`Xóa mẫu lịch ${row.code} thành công!`);
+        ElMessage.success(t('pattern.success_delete', { code: row.code }));
         fetchPatterns();
       } else {
-        ElMessage.error(res.message || 'Xóa thất bại');
+        ElMessage.error(res.message || t('pattern.error_delete'));
       }
     } catch (err: any) {
-      ElMessage.error(err.response?.data?.message || 'Không thể xóa mẫu lịch này do đang có lớp học tham chiếu liên kết.');
+      ElMessage.error(err.response?.data?.message || t('pattern.error_delete_referenced'));
     }
   }).catch(() => {});
 };

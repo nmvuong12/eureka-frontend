@@ -4,9 +4,9 @@
     <div class="pb-4 border-b border-gray-100">
       <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
         <span class="bg-gradient-to-b from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-        Quản lý Phòng học & Ca học
+        {{ $t('room.title_page') }}
       </h1>
-      <p class="text-sm text-gray-500 mt-1">Quản lý danh sách phòng học, sức chứa và danh mục ca học theo thời khóa biểu.</p>
+      <p class="text-sm text-gray-500 mt-1">{{ $t('room.desc') }}</p>
     </div>
 
     <!-- Rooms Section -->
@@ -36,7 +36,7 @@
         </el-table-column>
         <el-table-column prop="capacity" :label="$t('room.capacity')" width="160">
           <template #default="{ row }">
-            <span class="font-semibold text-gray-700">{{ row.capacity }} chỗ ngồi</span>
+            <span class="font-semibold text-gray-700">{{ $t('room.col_capacity_val', { count: row.capacity }) }}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.status')" width="150">
@@ -52,7 +52,7 @@
         </el-table-column>
         <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
-            <el-tooltip content="Xem chi tiết" placement="top">
+            <el-tooltip :content="$t('account.tooltip_detail')" placement="top">
               <el-button type="info" link @click="openRoomModal(row, true)" class="hover:!text-blue-600">
                 <el-icon :size="16"><View /></el-icon>
               </el-button>
@@ -60,7 +60,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty description="Không có dữ liệu phòng học" />
+          <el-empty :description="$t('room.empty')" />
         </template>
       </el-table>
     </el-card>
@@ -71,9 +71,9 @@
         <div>
           <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
             <el-icon class="text-emerald-500"><Clock /></el-icon>
-            Quản lý Ca Học chuẩn
+            {{ $t('room.title_timeslots') }}
           </h2>
-          <p class="text-xs text-gray-400 mt-1">Click trực tiếp vào các Tag thứ để Bật/Tắt ca học đó cho ngày tương ứng.</p>
+          <p class="text-xs text-gray-400 mt-1">{{ $t('room.desc_timeslots') }}</p>
         </div>
         <el-button
           type="primary"
@@ -81,51 +81,51 @@
           class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300"
         >
           <el-icon class="mr-1"><Plus /></el-icon>
-          Thêm ca học mới
+          {{ $t('room.btn_add_timeslot') }}
         </el-button>
       </div>
 
       <el-table :data="groupedTimeslots" style="width: 100%" stripe class="premium-table" v-loading="loading">
-        <el-table-column prop="caName" label="Ca học" width="130" align="center">
+        <el-table-column prop="caName" :label="$t('room.col_timeslot')" width="130" align="center">
           <template #default="{ row }">
             <el-tag size="small" type="info" class="!bg-teal-50 !text-teal-700 !border-teal-100 font-extrabold text-[12px]">
-              {{ row.caName }}
+              {{ row.caName.startsWith('Ca') ? $t('timetable.ca') + ' ' + row.caName.substring(3) : row.caName }}
             </el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="Khung giờ học" width="180" align="center">
+        <el-table-column :label="$t('room.col_time_range')" width="180" align="center">
           <template #default="{ row }">
             <span class="font-extrabold text-gray-700">{{ row.startTime }} - {{ row.endTime }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Kích hoạt theo ngày học" min-width="320">
+        <el-table-column :label="$t('room.col_active_days')" min-width="320">
           <template #default="{ row }">
             <div class="flex flex-wrap gap-2">
               <el-tag
-                v-for="(dayName, dayKey) in weekDays"
+                v-for="(_, dayKey) in weekDays"
                 :key="dayKey"
                 :type="row.dayMap[dayKey].active ? getDayTagType(dayKey) : 'info'"
                 :effect="row.dayMap[dayKey].active ? 'dark' : 'plain'"
                 class="cursor-pointer font-bold !px-3.5 hover:scale-105 transition-all duration-200 select-none"
                 @click="toggleDay(row.caName, dayKey, row.dayMap[dayKey], row.startTime, row.endTime)"
               >
-                {{ dayName }}
+                {{ $t('dashboard.' + dayKey.substring(0, 3).toLowerCase()) }}
               </el-tag>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column label="Thao tác" width="160" align="center" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="160" align="center" fixed="right">
           <template #default="{ row }">
             <div class="flex justify-center gap-2">
-              <el-tooltip content="Chỉnh sửa giờ ca này" placement="top">
+              <el-tooltip :content="$t('room.tooltip_edit_time')" placement="top">
                 <el-button type="primary" link @click="openEditTimeDialog(row)" class="hover:!text-emerald-600">
                   <el-icon :size="16"><Edit /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="Xóa toàn bộ ca học này" placement="top">
+              <el-tooltip :content="$t('room.tooltip_delete_ca')" placement="top">
                 <el-button type="danger" link @click="handleDeleteCaRow(row)" class="hover:!text-rose-600">
                   <el-icon :size="16"><Delete /></el-icon>
                 </el-button>
@@ -134,7 +134,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty description="Không có dữ liệu ca học" />
+          <el-empty :description="$t('room.empty_timeslots')" />
         </template>
       </el-table>
     </el-card>
@@ -150,7 +150,7 @@
     >
       <el-form :model="roomForm" label-position="top" :disabled="isViewOnly" class="px-2">
         <el-form-item :label="$t('room.name')" required>
-          <el-input v-model="roomForm.name" placeholder="Nhập tên phòng học (VD: P101)..." />
+          <el-input v-model="roomForm.name" :placeholder="$t('room.placeholder_name')" />
         </el-form-item>
         <el-form-item :label="$t('room.capacity')" required>
           <el-input-number v-model="roomForm.capacity" :min="1" :max="500" class="w-full" />
@@ -193,7 +193,7 @@
     <!-- Dialog chỉnh sửa KHUNG GIỜ ca học đồng bộ -->
     <el-dialog
       v-model="showEditTimeDialog"
-      title="Chỉnh sửa Khung giờ Ca học"
+      :title="$t('room.dialog_edit_time_title')"
       width="450px"
       destroy-on-close
     >
@@ -201,15 +201,15 @@
         <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-2">
           <p class="text-sm text-emerald-800 font-bold flex items-center gap-1.5">
             <el-icon><InfoFilled /></el-icon>
-            Chỉnh sửa đồng bộ {{ editTimeForm.caName }}
+            {{ $t('room.dialog_edit_time_sync', { ca: editTimeForm.caName.startsWith('Ca') ? $t('timetable.ca') + ' ' + editTimeForm.caName.substring(3) : editTimeForm.caName }) }}
           </p>
           <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-            Thay đổi khung giờ tại đây sẽ tự động cập nhật đồng bộ cho tất cả các ngày trong tuần đã được kích hoạt của ca này.
+            {{ $t('room.dialog_edit_time_desc') }}
           </p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <el-form-item label="Giờ bắt đầu" required>
+          <el-form-item :label="$t('room.form_start')" required>
             <el-time-picker
               v-model="editTimeForm.startTime"
               format="HH:mm"
@@ -218,7 +218,7 @@
               class="w-full"
             />
           </el-form-item>
-          <el-form-item label="Giờ kết thúc" required>
+          <el-form-item :label="$t('room.form_end')" required>
             <el-time-picker
               v-model="editTimeForm.endTime"
               format="HH:mm"
@@ -232,14 +232,14 @@
 
       <template #footer>
         <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
-          <el-button @click="showEditTimeDialog = false">Hủy bỏ</el-button>
+          <el-button @click="showEditTimeDialog = false">{{ $t('room.btn_cancel') }}</el-button>
           <el-button
             type="primary"
             @click="saveTimeChange"
             :loading="savingTimeslot"
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 font-bold"
           >
-            Cập nhật giờ
+            {{ $t('room.btn_update_time') }}
           </el-button>
         </div>
       </template>
@@ -248,28 +248,28 @@
     <!-- Drawer thêm mới ca học custom hoàn toàn (Ca 6, Ca 7...) -->
     <el-drawer
       v-model="showAddTimeslotDrawer"
-      title="Tạo mới Ca học chuẩn"
+      :title="$t('room.dialog_create_timeslot')"
       size="450px"
       class="premium-drawer"
       custom-class="premium-drawer"
     >
       <el-form :model="addTimeslotForm" label-position="top" class="px-2">
-        <el-form-item label="Số ca học (VD: 6 cho Ca 6, 7 cho Ca 7...)" required>
+        <el-form-item :label="$t('room.form_ca_num')" required>
           <el-input-number v-model="addTimeslotForm.caNumber" :min="1" :max="20" class="w-full" />
         </el-form-item>
-        <el-form-item label="Kích hoạt theo ngày học" required>
+        <el-form-item :label="$t('room.form_active_days')" required>
           <el-checkbox-group v-model="addTimeslotForm.selectedDays" class="flex flex-wrap gap-2 mt-1">
-            <el-checkbox-button label="MONDAY">T2</el-checkbox-button>
-            <el-checkbox-button label="TUESDAY">T3</el-checkbox-button>
-            <el-checkbox-button label="WEDNESDAY">T4</el-checkbox-button>
-            <el-checkbox-button label="THURSDAY">T5</el-checkbox-button>
-            <el-checkbox-button label="FRIDAY">T6</el-checkbox-button>
-            <el-checkbox-button label="SATURDAY">T7</el-checkbox-button>
-            <el-checkbox-button label="SUNDAY">CN</el-checkbox-button>
+            <el-checkbox-button label="MONDAY">{{ $t('dashboard.mon') }}</el-checkbox-button>
+            <el-checkbox-button label="TUESDAY">{{ $t('dashboard.tue') }}</el-checkbox-button>
+            <el-checkbox-button label="WEDNESDAY">{{ $t('dashboard.wed') }}</el-checkbox-button>
+            <el-checkbox-button label="THURSDAY">{{ $t('dashboard.thu') }}</el-checkbox-button>
+            <el-checkbox-button label="FRIDAY">{{ $t('dashboard.fri') }}</el-checkbox-button>
+            <el-checkbox-button label="SATURDAY">{{ $t('dashboard.sat') }}</el-checkbox-button>
+            <el-checkbox-button label="SUNDAY">{{ $t('dashboard.sun') }}</el-checkbox-button>
           </el-checkbox-group>
         </el-form-item>
         <div class="grid grid-cols-2 gap-4">
-          <el-form-item label="Giờ bắt đầu" required>
+          <el-form-item :label="$t('room.form_start')" required>
             <el-time-picker
               v-model="addTimeslotForm.startTime"
               format="HH:mm"
@@ -278,7 +278,7 @@
               class="w-full"
             />
           </el-form-item>
-          <el-form-item label="Giờ kết thúc" required>
+          <el-form-item :label="$t('room.form_end')" required>
             <el-time-picker
               v-model="addTimeslotForm.endTime"
               format="HH:mm"
@@ -291,14 +291,14 @@
       </el-form>
       <template #footer>
         <div class="flex justify-end gap-2 p-4 border-t border-gray-100">
-          <el-button @click="showAddTimeslotDrawer = false">Hủy</el-button>
+          <el-button @click="showAddTimeslotDrawer = false">{{ $t('common.cancel') }}</el-button>
           <el-button
             type="primary"
             @click="saveNewTimeslot"
             :loading="savingTimeslot"
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 font-bold"
           >
-            Tạo ca học
+            {{ $t('room.btn_create_timeslot') }}
           </el-button>
         </div>
       </template>
@@ -355,13 +355,9 @@ const addTimeslotForm = ref({
   endTime: ''
 });
 
-/** Map tên ngày từ tiếng Anh sang tiếng Việt */
+/** Map tên ngày từ tiếng Anh sang tiếng Việt/Anh thông qua i18n */
 const formatDay = (day: string) => {
-  const map: Record<string, string> = {
-    MONDAY: 'Thứ Hai', TUESDAY: 'Thứ Ba', WEDNESDAY: 'Thứ Tư',
-    THURSDAY: 'Thứ Năm', FRIDAY: 'Thứ Sáu', SATURDAY: 'Thứ Bảy', SUNDAY: 'Chủ Nhật',
-  };
-  return map[day] ?? day;
+  return t(`leave.day_${day.toLowerCase()}`);
 };
 
 // Loại nhãn Tag màu theo ngày học
@@ -375,7 +371,7 @@ const getDayTagType = (day: string) => {
 
 // Hàm phân tích tên ca học từ nhãn (VD: "Thứ 2 - Ca 1" -> "Ca 1")
 const getCaName = (label: string) => {
-  if (!label) return 'Ca khác';
+  if (!label) return t('common.none');
   const match = label.match(/Ca\s*(\d+)/i);
   return match ? `Ca ${match[1]}` : label;
 };
@@ -456,7 +452,7 @@ const fetchData = async () => {
     rooms.value = (resRooms as any).data;
     timeslots.value = (resTimeslots as any).data;
   } catch (err) {
-    ElMessage.error(t('common.error'));
+    ElMessage.error(t('room.error_load'));
   } finally {
     loading.value = false;
   }
@@ -476,7 +472,7 @@ const openRoomModal = (room?: Room, viewOnly: boolean = false) => {
 /** Lưu thông tin phòng học mới hoặc cập nhật */
 const saveRoom = async () => {
   if (!roomForm.value.name) {
-    ElMessage.warning('Tên phòng học không được bỏ trống');
+    ElMessage.warning(t('room.warn_empty_name'));
     return;
   }
   saving.value = true;
@@ -485,12 +481,12 @@ const saveRoom = async () => {
     if (res.success) {
       showRoomModal.value = false;
       fetchData();
-      ElMessage.success('Lưu thông tin phòng học thành công');
+      ElMessage.success(t('room.success_save_room'));
     } else {
-      ElMessage.error(res.message || 'Lưu thất bại');
+      ElMessage.error(res.message || t('room.success_save_room_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || t('common.error'));
+    ElMessage.error(err.response?.data?.message || t('room.error_load'));
   } finally {
     saving.value = false;
   }
@@ -505,14 +501,16 @@ const toggleDay = async (caName: string, dayOfWeek: string, current: { active: b
   const dayLabel = dayLabelMap[dayOfWeek] || dayOfWeek;
   const label = `${dayLabel} - ${caName}`;
 
+  const displayCaName = caName.startsWith('Ca') ? t('timetable.ca') + ' ' + caName.substring(3) : caName;
+
   if (current.active && current.id) {
     // Đã kích hoạt -> Click để TẮT (Gửi lệnh Xóa ca học khỏi Database)
     ElMessageBox.confirm(
-      `Bạn có chắc chắn muốn HỦY ca học '${caName}' vào ngày ${formatDay(dayOfWeek)} không?`,
-      'Hủy kích hoạt ca học',
+      t('room.confirm_deactivate_text', { caName: displayCaName, day: formatDay(dayOfWeek) }),
+      t('room.confirm_deactivate_title'),
       {
-        confirmButtonText: 'Hủy kích hoạt',
-        cancelButtonText: 'Quay lại',
+        confirmButtonText: t('room.btn_deactivate_confirm'),
+        cancelButtonText: t('room.btn_deactivate_cancel'),
         type: 'warning'
       }
     ).then(async () => {
@@ -520,13 +518,13 @@ const toggleDay = async (caName: string, dayOfWeek: string, current: { active: b
       try {
         const res: any = await api.delete(`/timeslots/${current.id}`);
         if (res.success) {
-          ElMessage.success(`Đã hủy ca '${caName}' ngày ${formatDay(dayOfWeek)}`);
+          ElMessage.success(t('room.success_deactivate', { caName: displayCaName, day: formatDay(dayOfWeek) }));
           fetchData();
         } else {
-          ElMessage.error(res.message || 'Hủy thất bại');
+          ElMessage.error(res.message || t('room.success_save_room_failed'));
         }
       } catch (err: any) {
-        ElMessage.error(err.response?.data?.message || 'Không thể hủy ca học này do đã được phân bổ cho lớp học thực tế.');
+        ElMessage.error(err.response?.data?.message || t('room.error_deactivate_referenced'));
       } finally {
         loading.value = false;
       }
@@ -543,13 +541,13 @@ const toggleDay = async (caName: string, dayOfWeek: string, current: { active: b
       };
       const res: any = await api.post('/timeslots', payload);
       if (res.success) {
-        ElMessage.success(`Đã kích hoạt ca '${caName}' ngày ${formatDay(dayOfWeek)}!`);
+        ElMessage.success(t('room.success_activate', { caName: displayCaName, day: formatDay(dayOfWeek) }));
         fetchData();
       } else {
-        ElMessage.error(res.message || 'Kích hoạt thất bại');
+        ElMessage.error(res.message || t('room.success_save_room_failed'));
       }
     } catch (err) {
-      ElMessage.error('Không thể kích hoạt ca học');
+      ElMessage.error(t('room.error_activate_failed'));
     } finally {
       loading.value = false;
     }
@@ -578,7 +576,7 @@ const openEditTimeDialog = (row: any) => {
 const saveTimeChange = async () => {
   const f = editTimeForm.value;
   if (!f.startTime || !f.endTime) {
-    ElMessage.warning('Vui lòng nhập đầy đủ giờ bắt đầu và giờ kết thúc');
+    ElMessage.warning(t('room.warn_fill_timeslot'));
     return;
   }
 
@@ -600,11 +598,12 @@ const saveTimeChange = async () => {
       }));
     }
 
-    ElMessage.success(`Cập nhật đồng bộ khung giờ cho ${f.caName} thành công!`);
+    const displayCaName = f.caName.startsWith('Ca') ? t('timetable.ca') + ' ' + f.caName.substring(3) : f.caName;
+    ElMessage.success(t('room.success_update_sync', { caName: displayCaName }));
     showEditTimeDialog.value = false;
     fetchData();
   } catch (err) {
-    ElMessage.error('Có lỗi xảy ra khi cập nhật giờ ca học');
+    ElMessage.error(t('room.error_update_sync'));
   } finally {
     savingTimeslot.value = false;
   }
@@ -621,17 +620,19 @@ const handleDeleteCaRow = (row: any) => {
     }
   });
 
+  const displayCaName = row.caName.startsWith('Ca') ? t('timetable.ca') + ' ' + row.caName.substring(3) : row.caName;
+
   if (ids.length === 0) {
-    ElMessage.info(`Ca học ${row.caName} hiện chưa được kích hoạt vào bất kỳ ngày học nào.`);
+    ElMessage.info(t('room.info_ca_not_active', { caName: displayCaName }));
     return;
   }
 
   ElMessageBox.confirm(
-    `Bạn có chắc chắn muốn xóa toàn bộ ca học '${row.caName}' (${row.startTime} - ${row.endTime}) ở tất cả các ngày đã kích hoạt không?`,
-    'Xác nhận xóa toàn bộ ca học',
+    t('room.confirm_delete_ca_text', { caName: displayCaName, start: row.startTime, end: row.endTime }),
+    t('room.confirm_delete_ca_title'),
     {
-      confirmButtonText: 'Đồng ý xóa',
-      cancelButtonText: 'Hủy bỏ',
+      confirmButtonText: t('room.btn_delete_confirm'),
+      cancelButtonText: t('room.btn_delete_cancel'),
       type: 'warning'
     }
   ).then(async () => {
@@ -639,10 +640,10 @@ const handleDeleteCaRow = (row: any) => {
     try {
       // Gọi API xóa song song toàn bộ các ca học của các ngày đã chọn
       await Promise.all(ids.map(id => api.delete(`/timeslots/${id}`)));
-      ElMessage.success(`Xóa toàn bộ ca học ${row.caName} thành công!`);
+      ElMessage.success(t('room.success_delete_ca', { caName: displayCaName }));
       fetchData();
     } catch (err: any) {
-      ElMessage.error(err.response?.data?.message || 'Không thể xóa một số ngày của ca học này do đã được gán vào Mẫu lịch học hoặc lớp học thực tế.');
+      ElMessage.error(err.response?.data?.message || t('room.error_delete_ca_referenced'));
       fetchData();
     } finally {
       loading.value = false;
@@ -665,7 +666,7 @@ const openAddTimeslotDrawer = () => {
 const saveNewTimeslot = async () => {
   const f = addTimeslotForm.value;
   if (f.selectedDays.length === 0 || !f.startTime || !f.endTime) {
-    ElMessage.warning('Vui lòng chọn ít nhất 1 ngày học và nhập đầy đủ giờ');
+    ElMessage.warning(t('room.warn_add_timeslot_fill'));
     return;
   }
 
@@ -688,11 +689,12 @@ const saveNewTimeslot = async () => {
       });
     }));
 
+    const displayCaName = caName.startsWith('Ca') ? t('timetable.ca') + ' ' + caName.substring(3) : caName;
     showAddTimeslotDrawer.value = false;
     fetchData();
-    ElMessage.success(`Tạo thành công ${caName} và kích hoạt cho ${f.selectedDays.length} ngày học!`);
+    ElMessage.success(t('room.success_create_timeslot', { caName: displayCaName, count: f.selectedDays.length }));
   } catch (err) {
-    ElMessage.error('Có lỗi xảy ra khi lưu ca học mới');
+    ElMessage.error(t('room.error_update_sync'));
   } finally {
     savingTimeslot.value = false;
   }

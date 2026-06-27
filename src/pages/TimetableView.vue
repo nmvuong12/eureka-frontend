@@ -7,18 +7,18 @@
           <span class="bg-gradient-to-b from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
           {{ $t('timetable.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Xem và quản lý thời khóa biểu xếp lịch chuẩn hàng tuần hoặc lịch giảng dạy thực tế theo tuần dương lịch.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('timetable.desc') }}</p>
       </div>
 
       <!-- Mode Selector Tabs -->
       <el-radio-group v-model="viewMode" size="large" class="shadow-sm rounded-xl overflow-hidden border border-gray-100" @change="handleModeChange">
         <el-radio-button value="recurring">
           <el-icon class="mr-1"><Calendar /></el-icon>
-          Lịch học chuẩn hàng tuần
+          {{ $t('timetable.mode_recurring') }}
         </el-radio-button>
         <el-radio-button value="calendar">
           <el-icon class="mr-1"><Clock /></el-icon>
-          Lịch thực tế theo tuần
+          {{ $t('timetable.mode_calendar') }}
         </el-radio-button>
       </el-radio-group>
     </div>
@@ -38,24 +38,24 @@
             <el-icon><ArrowRight /></el-icon>
           </el-button>
           <el-button size="default" type="primary" plain @click="selectCurrentWeek" class="ml-1">
-            Tuần này
+            {{ $t('timetable.week_current') }}
           </el-button>
         </div>
 
         <!-- Course Batch Filter -->
         <div v-if="authStore.isAdmin || !authStore.isTeacher" class="flex flex-col gap-1">
           <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Kế hoạch khai giảng
+            {{ $t('timetable.filter_batch') }}
           </label>
           <el-select
             v-model="filters.batchId"
             filterable
             clearable
-            placeholder="Tất cả kế hoạch"
+            :placeholder="$t('timetable.filter_batch_placeholder')"
             class="w-52"
             @change="handleBatchChange"
           >
-            <el-option :value="null" label="Tất cả kế hoạch" />
+            <el-option :value="null" :label="$t('timetable.filter_batch_placeholder')" />
             <el-option v-for="b in batches" :key="b.id" :value="b.id" :label="b.batchName" />
           </el-select>
         </div>
@@ -129,7 +129,7 @@
             class="!bg-amber-600 hover:!bg-amber-700 !border-amber-600 shadow-md text-white font-semibold"
           >
             <el-icon class="mr-1"><Lock /></el-icon>
-            Khóa lịch học
+            {{ $t('timetable.lock_btn') }}
           </el-button>
         </div>
       </div>
@@ -188,7 +188,7 @@
                     <span class="truncate">{{ lesson.roomName || $t('common.no_data') }}</span>
                   </div>
                   <div class="text-[10px] text-gray-400 mt-1 flex justify-between items-center">
-                    <span>Buổi {{ lesson.lessonIndex }}</span>
+                    <span>{{ $t('timetable.detail_lesson_val', { index: lesson.lessonIndex }) }}</span>
                     <span v-if="lesson.sessionDate" class="text-emerald-600 font-medium">{{ formatDateDDMM(lesson.sessionDate) }}</span>
                   </div>
                 </div>
@@ -474,20 +474,15 @@ const lockSchedule = async () => {
   const batchId = filters.value.batchId;
   const batchName = batchId 
     ? batches.value.find(b => b.id === batchId)?.batchName || `ID ${batchId}`
-    : 'toàn trung tâm';
+    : t('timetable.lock_all_center');
 
   try {
     await ElMessageBox.confirm(
-      `Bạn có chắc chắn muốn khóa thời khóa biểu cho <strong>${batchName}</strong>? <br/><br/>` +
-      `<strong>Lưu ý quan trọng:</strong> <br/>` +
-      `- Lịch học chuẩn hàng tuần của các lớp sẽ được ghim cố định.<br/>` +
-      `- Trạng thái các lớp học sẽ tự động chuyển sang <strong>ĐANG HỌC (STUDYING)</strong>.<br/>` +
-      `- Thuật toán xếp lịch tự động (Solver) sẽ hoàn toàn giữ nguyên lịch này và không tự ý thay đổi nữa.<br/>` +
-      `- Mọi điều chỉnh phát sinh sau này chỉ có thể thực hiện theo từng ngày dương lịch cụ thể trong chức năng <strong>Điều phối lịch</strong>.`,
-      'Xác nhận Khóa thời khóa biểu',
+      t('timetable.lock_confirm_text', { name: batchName }),
+      t('timetable.lock_confirm_title'),
       {
-        confirmButtonText: 'Khóa lịch ngay',
-        cancelButtonText: 'Hủy bỏ',
+        confirmButtonText: t('timetable.lock_confirm_btn'),
+        cancelButtonText: t('timetable.lock_cancel_btn'),
         type: 'warning',
         dangerouslyUseHTMLString: true
       }
@@ -501,18 +496,18 @@ const lockSchedule = async () => {
     if (res.success) {
       ElMessage({
         type: 'success',
-        message: `Khóa thời khóa biểu thành công! Đã ghim ${res.data.lockedSessions} buổi học và kích hoạt trạng thái lớp học.`,
+        message: t('timetable.lock_success', { count: res.data.lockedSessions }),
         duration: 5000
       });
       // Tải lại dữ liệu thời khóa biểu và metadata
       await Promise.all([fetchTimetable(), loadMetadata()]);
     } else {
-      ElMessage.error(res.message || 'Khóa thời khóa biểu thất bại');
+      ElMessage.error(res.message || t('timetable.lock_failed'));
     }
   } catch (err) {
     if (err !== 'cancel') {
       console.error('Lỗi khi khóa thời khóa biểu', err);
-      ElMessage.error('Có lỗi xảy ra khi khóa thời khóa biểu');
+      ElMessage.error(t('timetable.lock_error'));
     }
   } finally {
     locking.value = false;
@@ -522,26 +517,26 @@ const lockSchedule = async () => {
 // Hiển thị modal chi tiết buổi học
 const openLessonDetails = (lesson: TimetableEntry) => {
   const dateInfo = lesson.sessionDate 
-    ? `<p><strong>Ngày học:</strong> ${formatDateDDMMYYYY(new Date(lesson.sessionDate))} (${formatDay(lesson.dayOfWeek)})</p>` 
-    : `<p><strong>Lịch dạy chuẩn:</strong> ${formatDay(lesson.dayOfWeek)}</p>`;
+    ? `<p><strong>${t('timetable.detail_date_actual')}</strong> ${formatDateDDMMYYYY(new Date(lesson.sessionDate))} (${formatDay(lesson.dayOfWeek)})</p>` 
+    : `<p><strong>${t('timetable.detail_date_standard')}</strong> ${formatDay(lesson.dayOfWeek)}</p>`;
 
   const showDispatchBtn = !!(lesson.sessionDate && (authStore.isAdmin || !authStore.isTeacher));
 
   ElMessageBox.confirm(
     `<div class="space-y-2 text-sm leading-relaxed">
       <p><strong>${t('class.name')}:</strong> <span class="font-semibold text-gray-800">${lesson.className}</span></p>
-      <p><strong>Buổi số:</strong> <span class="font-bold text-emerald-700">Buổi #${lesson.lessonIndex}</span></p>
+      <p><strong>${t('timetable.detail_lesson_no')}</strong> <span class="font-bold text-emerald-700">${t('timetable.detail_lesson_val', { index: lesson.lessonIndex })}</span></p>
       ${dateInfo}
       <p><strong>${t('timetable.ca')}:</strong> ${lesson.timeslotLabel}</p>
       <p><strong>${t('menu.teachers')}:</strong> ${lesson.teacherName || t('common.no_data')}</p>
       <p><strong>${t('room.title')}:</strong> ${lesson.roomName || t('common.no_data')}</p>
-      <p><strong>Trạng thái:</strong> ${lesson.pinned ? '<span class="text-amber-600 font-semibold inline-flex items-center gap-1"><i class="el-icon-lock"></i> Đã ghim điều phối/Khóa</span>' : '<span class="text-emerald-600">Tự động chuẩn</span>'}</p>
+      <p><strong>${t('timetable.detail_status')}</strong> ${lesson.pinned ? `<span class="text-amber-600 font-semibold inline-flex items-center gap-1"><i class="el-icon-lock"></i> ${t('timetable.detail_status_pinned')}</span>` : `<span class="text-emerald-600">${t('timetable.detail_status_auto')}</span>`}</p>
     </div>`,
     t('timetable.lesson_detail') || 'Chi tiết buổi học',
     {
       dangerouslyUseHTMLString: true,
-      confirmButtonText: showDispatchBtn ? 'Đi đến Điều phối' : 'Đóng',
-      cancelButtonText: showDispatchBtn ? 'Đóng' : undefined,
+      confirmButtonText: showDispatchBtn ? t('timetable.detail_btn_dispatch') : t('timetable.detail_btn_close'),
+      cancelButtonText: showDispatchBtn ? t('timetable.detail_btn_close') : undefined,
       showCancelButton: showDispatchBtn,
       type: 'info'
     }

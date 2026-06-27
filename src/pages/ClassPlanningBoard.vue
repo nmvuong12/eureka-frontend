@@ -5,9 +5,9 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-          Lập kế hoạch mở lớp
+          {{ $t('planning.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Lập kế hoạch mở lớp học, kiểm tra công suất tối đa thực tế và cân bằng sĩ số tuyển sinh.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('planning.desc') }}</p>
       </div>
     </div>
 
@@ -15,13 +15,13 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Cột trái: Chọn kế hoạch mở lớp -->
       <div class="lg:col-span-4 space-y-4">
-        <el-card shadow="sm" class="border border-gray-100 rounded-2xl h-full" header="Kế hoạch tuyển sinh & khai giảng">
+        <el-card shadow="sm" class="border border-gray-100 rounded-2xl h-full" :header="$t('planning.card_batch')">
           <div class="space-y-4">
             <el-form label-position="top">
-              <el-form-item label="Chọn kế hoạch khai giảng">
+              <el-form-item :label="$t('planning.select_batch')">
                 <el-select
                   v-model="selectedBatchId"
-                  placeholder="Chọn kế hoạch..."
+                  :placeholder="$t('planning.select_batch_placeholder')"
                   filterable
                   class="w-full"
                   @change="handleBatchChange"
@@ -40,33 +40,33 @@
             <transition name="fade">
               <div v-if="selectedBatch" class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-3">
                 <div class="flex items-center justify-between border-b border-emerald-100 pb-2">
-                  <span class="text-xs text-emerald-800 font-bold uppercase tracking-wider">Thông tin chi tiết</span>
+                  <span class="text-xs text-emerald-800 font-bold uppercase tracking-wider">{{ $t('planning.detail_title') }}</span>
                   <el-tag size="small" :type="getBatchStatusType(selectedBatch.status)" effect="dark">
                     {{ getBatchStatusLabel(selectedBatch.status) }}
                   </el-tag>
                 </div>
                 <div class="text-sm space-y-2 text-gray-700">
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Khóa học:</span>
+                    <span class="text-gray-400">{{ $t('planning.detail_course') }}</span>
                     <span class="font-bold text-gray-800">{{ selectedBatch.courseName }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Mã khóa học:</span>
+                    <span class="text-gray-400">{{ $t('planning.detail_code') }}</span>
                     <span class="font-semibold text-emerald-700">{{ selectedBatch.courseCode }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Thời gian tuyển sinh:</span>
+                    <span class="text-gray-400">{{ $t('planning.detail_enroll_time') }}</span>
                     <span class="font-medium">
                       {{ formatDate(selectedBatch.enrollmentStartDate) }} - {{ formatDate(selectedBatch.enrollmentEndDate) }}
                     </span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Khai giảng dự kiến:</span>
+                    <span class="text-gray-400">{{ $t('planning.detail_expected_open') }}</span>
                     <span class="font-semibold text-teal-700">{{ formatDate(selectedBatch.expectedOpeningDate) }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Quy mô tuyển sinh:</span>
-                    <span class="font-bold">{{ selectedBatch.forecastScale ?? 0 }} học viên</span>
+                    <span class="text-gray-400">{{ $t('planning.detail_forecast_scale') }}</span>
+                    <span class="font-bold">{{ $t('planning.detail_students', { count: selectedBatch.forecastScale ?? 0 }) }}</span>
                   </div>
                 </div>
 
@@ -79,10 +79,10 @@
                     @click="handleSmartGenerate"
                   >
                     <el-icon><Cpu /></el-icon>
-                    Lập kế hoạch Tự động
+                    {{ $t('planning.btn_auto_plan') }}
                   </el-button>
                   <p class="text-[10px] text-indigo-600 text-center leading-relaxed font-semibold">
-                    (Phù hợp nhất dựa trên phòng và giáo viên rảnh)
+                    {{ $t('planning.auto_plan_help') }}
                   </p>
                 </div>
               </div>
@@ -93,32 +93,32 @@
 
       <!-- Cột phải: Capacity Dashboard -->
       <div class="lg:col-span-8">
-        <el-card shadow="sm" class="border border-gray-100 rounded-2xl h-full" header="Bảng công suất lớp học tối đa (Capacity Dashboard)">
+        <el-card shadow="sm" class="border border-gray-100 rounded-2xl h-full" :header="$t('planning.card_capacity')">
           <div v-if="!selectedBatchId" class="h-48 flex flex-col justify-center items-center text-gray-400">
             <el-icon :size="40" class="mb-2"><Calendar /></el-icon>
-            <span>Vui lòng chọn một kế hoạch khai giảng ở bên trái để xem công suất nguồn lực thực tế</span>
+            <span>{{ $t('planning.capacity_select_batch') }}</span>
           </div>
 
           <div v-else v-loading="capacityLoading" class="space-y-4">
             <el-table :data="capacityDashboard" style="width: 100%" height="220" stripe class="premium-table">
-              <el-table-column prop="patternCode" label="Mã" width="70" align="center" />
-              <el-table-column prop="displayLabel" label="Lịch học & Ca" min-width="170" />
-              <el-table-column prop="capacity" label="Tối đa" width="80" align="center">
+              <el-table-column prop="patternCode" :label="$t('planning.col_code')" width="70" align="center" />
+              <el-table-column prop="displayLabel" :label="$t('planning.col_pattern')" min-width="170" />
+              <el-table-column prop="capacity" :label="$t('planning.col_max')" width="80" align="center">
                 <template #default="{ row }">
-                  <el-tag size="small" type="success" effect="plain" class="font-bold">{{ row.capacity }} lớp</el-tag>
+                  <el-tag size="small" type="success" effect="plain" class="font-bold">{{ $t('planning.col_max_val', { count: row.capacity }) }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="occupied" label="Đang học" width="90" align="center" />
-              <el-table-column prop="remaining" label="Còn rảnh" width="90" align="center">
+              <el-table-column prop="occupied" :label="$t('planning.col_studying')" width="90" align="center" />
+              <el-table-column prop="remaining" :label="$t('planning.col_free')" width="90" align="center">
                 <template #default="{ row }">
                   <span :class="row.remaining > 0 ? 'text-emerald-600 font-bold' : 'text-red-500 font-bold'">
                     {{ row.remaining }}
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column prop="availableTeachers" label="GV rảnh" width="90" align="center" />
-              <el-table-column prop="availableRooms" label="Phòng trống" width="110" align="center" />
-              <el-table-column label="Hành động" width="90" align="center" fixed="right">
+              <el-table-column prop="availableTeachers" :label="$t('planning.col_free_teachers')" width="90" align="center" />
+              <el-table-column prop="availableRooms" :label="$t('planning.col_free_rooms')" width="110" align="center" />
+              <el-table-column :label="$t('planning.col_action')" width="90" align="center" fixed="right">
                 <template #default="{ row }">
                   <el-button
                     type="primary"
@@ -127,7 +127,7 @@
                     @click="selectPattern(row)"
                     class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600"
                   >
-                    Chọn
+                    {{ $t('planning.btn_select') }}
                   </el-button>
                 </template>
               </el-table-column>
@@ -137,15 +137,13 @@
             <transition name="fade">
               <div v-if="selectedPatternItem" class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
                 <div class="space-y-1">
-                  <div class="text-sm font-bold text-gray-800">
-                    Đã chọn: Pattern <span class="text-emerald-600">{{ selectedPatternItem.patternCode }}</span> - {{ selectedPatternItem.displayLabel }}
+                  <div class="text-sm font-bold text-gray-800" v-html="$t('planning.selected_pattern', { code: '<span class=\'text-emerald-600\'>' + selectedPatternItem.patternCode + '</span>', label: selectedPatternItem.displayLabel })">
                   </div>
-                  <div class="text-xs text-gray-500">
-                    Năng lực đáp ứng tối đa còn lại: <span class="font-bold text-emerald-600">{{ selectedPatternItem.remaining }}</span> lớp.
+                  <div class="text-xs text-gray-500" v-html="$t('planning.remaining_capacity', { count: '<span class=\'font-bold text-emerald-600\'>' + selectedPatternItem.remaining + '</span>' })">
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <span class="text-sm text-gray-600">Số lớp muốn mở:</span>
+                  <span class="text-sm text-gray-600">{{ $t('planning.classes_to_open') }}</span>
                   <el-input-number
                     v-model="classesToGenerate"
                     :min="1"
@@ -159,7 +157,7 @@
                     @click="generateDraftClasses"
                     class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600"
                   >
-                    Tạo lớp DRAFT
+                    {{ $t('planning.btn_generate_draft') }}
                   </el-button>
                 </div>
               </div>
@@ -174,7 +172,7 @@
       <div class="flex items-center justify-between pb-2">
         <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
           <el-icon class="text-emerald-600"><SetUp /></el-icon>
-          Quy trình quản lý & Mở lớp học
+          {{ $t('planning.workflow_title') }}
         </h3>
 
         <!-- Nút thao tác nhanh của Batch -->
@@ -185,7 +183,7 @@
             @click="activateEnrollment"
             class="!bg-blue-600 hover:!bg-blue-700 !border-blue-600"
           >
-            Kích hoạt tất cả DRAFT tuyển sinh
+            {{ $t('planning.btn_activate_drafts') }}
           </el-button>
         </div>
       </div>
@@ -196,7 +194,7 @@
           <div class="flex justify-between items-center pb-3 border-b border-gray-200 mb-4">
             <span class="text-sm font-bold text-gray-700 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
-              BẢN NHÁP (DRAFT)
+              {{ $t('planning.step_draft') }}
             </span>
             <el-tag size="small" type="info" class="font-bold">{{ getCountByStatus('DRAFT') }}</el-tag>
           </div>
@@ -208,18 +206,18 @@
             >
               <div class="flex justify-between items-start">
                 <span class="font-bold text-gray-800 text-sm">{{ c.classCode }}</span>
-                <el-tag size="small" type="info">Draft</el-tag>
+                <el-tag size="small" type="info">{{ $t('planning.step_draft') }}</el-tag>
               </div>
               <div class="text-xs text-gray-500 space-y-1">
                 <div><span class="font-medium text-teal-700">{{ c.patternLabel || c.patternCode }}</span></div>
-                <div>Sĩ số: <span class="font-semibold text-gray-700">{{ c.studentCount ?? 0 }}</span> học viên</div>
+                <div v-html="$t('planning.student_count_label', { count: '<span class=\'font-semibold text-gray-700\'>' + (c.studentCount ?? 0) + '</span>' })"></div>
               </div>
               <div class="flex justify-end gap-1.5 pt-2 border-t border-gray-100">
-                <el-button type="danger" link size="small" @click="cancelClass(c)">Hủy</el-button>
+                <el-button type="danger" link size="small" @click="cancelClass(c)">{{ $t('planning.btn_cancel') }}</el-button>
               </div>
             </div>
             <div v-if="getCountByStatus('DRAFT') === 0" class="h-32 flex justify-center items-center text-xs text-gray-400 italic">
-              Không có lớp nháp nào
+              {{ $t('planning.no_draft_classes') }}
             </div>
           </div>
         </div>
@@ -229,7 +227,7 @@
           <div class="flex justify-between items-center pb-3 border-b border-blue-200 mb-4">
             <span class="text-sm font-bold text-blue-700 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              TUYỂN SINH (ENROLLING)
+              {{ $t('planning.step_enrolling') }}
             </span>
             <el-tag size="small" type="primary" class="font-bold">{{ getCountByStatus('ENROLLING') }}</el-tag>
           </div>
@@ -241,23 +239,23 @@
             >
               <div class="flex justify-between items-start">
                 <span class="font-bold text-gray-800 text-sm">{{ c.classCode }}</span>
-                <el-tag size="small" type="primary">Tuyển sinh</el-tag>
+                <el-tag size="small" type="primary">{{ $t('planning.enrolling_tag') }}</el-tag>
               </div>
               <div class="text-xs text-gray-500 space-y-1">
                 <div><span class="font-medium text-teal-700">{{ c.patternLabel || c.patternCode }}</span></div>
-                <div>Sĩ số thực tế: <span class="font-bold text-blue-600 text-sm">{{ c.studentCount ?? 0 }}</span> học viên</div>
+                <div v-html="$t('planning.student_count_actual', { count: '<span class=\'font-bold text-blue-600 text-sm\'>' + (c.studentCount ?? 0) + '</span>' })"></div>
               </div>
               <div class="flex justify-between items-center pt-2 border-t border-gray-100">
-                <el-button type="danger" link size="small" @click="cancelClass(c)">Hủy</el-button>
+                <el-button type="danger" link size="small" @click="cancelClass(c)">{{ $t('planning.btn_cancel') }}</el-button>
                 <div class="flex gap-1">
                   <el-button type="primary" size="small" @click="openStudentCountDialog(c)">
-                    Nhập sĩ số
+                    {{ $t('planning.btn_input_count') }}
                   </el-button>
                 </div>
               </div>
             </div>
             <div v-if="getCountByStatus('ENROLLING') === 0" class="h-32 flex justify-center items-center text-xs text-gray-400 italic">
-              Không có lớp nào đang tuyển sinh
+              {{ $t('planning.no_enrolling_classes') }}
             </div>
           </div>
         </div>
@@ -267,7 +265,7 @@
           <div class="flex justify-between items-center pb-3 border-b border-orange-200 mb-4">
             <span class="text-sm font-bold text-orange-700 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-              CÂN BẰNG (REBALANCING)
+              {{ $t('planning.step_rebalancing') }}
             </span>
             <el-tag size="small" type="warning" class="font-bold">{{ getCountByStatus('REBALANCING') }}</el-tag>
           </div>
@@ -276,7 +274,7 @@
             <div v-if="getUniquePatternsForRebalance().length > 0" class="pb-2 border-b border-orange-100 mb-2">
               <el-dropdown trigger="click" @command="handleRebalanceCommand" class="w-full">
                 <el-button type="warning" class="w-full justify-center">
-                  Bắt đầu Cân bằng Sĩ số...
+                  {{ $t('planning.btn_start_rebalance') }}
                   <el-icon class="el-icon--right"><ArrowDown /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -286,7 +284,7 @@
                       :key="pid"
                       :command="pid"
                     >
-                      Cân bằng Pattern {{ getPatternCodeById(pid) }}
+                      {{ $t('planning.btn_rebalance_pattern', { code: getPatternCodeById(pid) }) }}
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -300,19 +298,19 @@
             >
               <div class="flex justify-between items-start">
                 <span class="font-bold text-gray-800 text-sm">{{ c.classCode }}</span>
-                <el-tag size="small" type="warning">Cân bằng</el-tag>
+                <el-tag size="small" type="warning">{{ $t('planning.rebalancing_tag') }}</el-tag>
               </div>
               <div class="text-xs text-gray-500 space-y-1">
                 <div><span class="font-medium text-teal-700">{{ c.patternLabel || c.patternCode }}</span></div>
-                <div>Sĩ số hiện tại: <span class="font-bold text-orange-600 text-sm">{{ c.studentCount ?? 0 }}</span> học viên</div>
+                <div v-html="$t('planning.student_count_current', { count: '<span class=\'font-bold text-orange-600 text-sm\'>' + (c.studentCount ?? 0) + '</span>' })"></div>
                 <div v-if="selectedBatch" class="text-[10px] text-gray-400">
-                  (Min chuẩn khóa: {{ selectedBatchForecastMin }} học viên)
+                  {{ $t('planning.min_course_standard', { count: selectedBatchForecastMin }) }}
                 </div>
               </div>
               <div class="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
                 <div class="flex justify-between items-center w-full">
-                  <el-button type="danger" link size="small" @click="cancelClass(c)">Hủy</el-button>
-                  <el-button type="info" link size="small" @click="openMergeDialog(c)">Gộp lớp</el-button>
+                  <el-button type="danger" link size="small" @click="cancelClass(c)">{{ $t('planning.btn_cancel') }}</el-button>
+                  <el-button type="info" link size="small" @click="openMergeDialog(c)">{{ $t('planning.btn_merge') }}</el-button>
                 </div>
                 <div class="flex justify-between gap-1 w-full mt-1">
                   <el-button
@@ -322,7 +320,7 @@
                     @click="openClass(c)"
                     class="flex-1 !bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 !text-xs !px-1.5"
                   >
-                    Mở lớp
+                    {{ $t('planning.btn_open') }}
                   </el-button>
                   <el-button
                     type="warning"
@@ -330,13 +328,13 @@
                     @click="forceOpenClass(c)"
                     class="flex-1 !text-xs !px-1.5"
                   >
-                    Buộc mở
+                    {{ $t('planning.btn_force_open') }}
                   </el-button>
                 </div>
               </div>
             </div>
             <div v-if="getCountByStatus('REBALANCING') === 0" class="h-32 flex justify-center items-center text-xs text-gray-400 italic">
-              Không có lớp nào cần cân bằng
+              {{ $t('planning.no_rebalancing_classes') }}
             </div>
           </div>
         </div>
@@ -346,7 +344,7 @@
           <div class="flex justify-between items-center pb-3 border-b border-emerald-200 mb-4">
             <span class="text-sm font-bold text-emerald-700 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              ĐÃ MỞ LỚP (OPEN)
+              {{ $t('planning.step_opened') }}
             </span>
             <el-tag size="small" type="success" class="font-bold">{{ getCountByStatus('OPEN') }}</el-tag>
           </div>
@@ -361,18 +359,18 @@
               </div>
               <div class="flex justify-between items-start pr-6">
                 <span class="font-bold text-gray-800 text-sm">{{ c.classCode }}</span>
-                <el-tag size="small" type="success">Đã mở</el-tag>
+                <el-tag size="small" type="success">{{ $t('planning.opened_tag') }}</el-tag>
               </div>
               <div class="text-xs text-gray-500 space-y-1">
                 <div><span class="font-medium text-teal-700">{{ c.patternLabel || c.patternCode }}</span></div>
-                <div>Sĩ số chính thức: <span class="font-bold text-emerald-600">{{ c.studentCount ?? 0 }}</span> học viên</div>
+                <div v-html="$t('planning.student_count_official', { count: '<span class=\'font-bold text-emerald-600\'>' + (c.studentCount ?? 0) + '</span>' })"></div>
               </div>
               <div class="bg-emerald-50 border border-emerald-100 rounded p-2 text-[10px] text-emerald-800 font-medium text-center">
-                Đang chờ chạy Timefold Solver xếp phòng & giáo viên
+                {{ $t('planning.waiting_solver') }}
               </div>
             </div>
             <div v-if="getCountByStatus('OPEN') === 0" class="h-32 flex justify-center items-center text-xs text-gray-400 italic">
-              Không có lớp nào đã được mở
+              {{ $t('planning.no_opened_classes') }}
             </div>
           </div>
         </div>
@@ -380,37 +378,35 @@
     </div>
 
     <!-- Dialog Nhập sĩ số thực tế -->
-    <el-dialog v-model="studentCountDialogVisible" title="Nhập sĩ số thực tế sau tuyển sinh" width="400px" destroy-on-close>
+    <el-dialog v-model="studentCountDialogVisible" :title="$t('planning.dialog_input_title')" width="400px" destroy-on-close>
       <el-form label-position="top">
-        <el-form-item :label="`Nhập sĩ số lớp ${selectedClass?.classCode}`" required>
+        <el-form-item :label="$t('planning.dialog_input_label', { code: selectedClass?.classCode })" required>
           <el-input-number v-model="studentCountInput" :min="0" :max="100" class="w-full" />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <el-button @click="studentCountDialogVisible = false">Hủy</el-button>
+          <el-button @click="studentCountDialogVisible = false">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" :loading="updatingCount" @click="saveStudentCount" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
-            Xác nhận
+            {{ $t('common.confirm') }}
           </el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- Dialog Gộp lớp -->
-    <el-dialog v-model="mergeDialogVisible" title="Gộp lớp học học viên ít" width="500px" destroy-on-close>
+    <el-dialog v-model="mergeDialogVisible" :title="$t('planning.dialog_merge_title')" width="500px" destroy-on-close>
       <div v-if="selectedClass" class="space-y-4">
-        <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 text-xs text-orange-800 space-y-1">
-          <div>Lớp hiện tại: <span class="font-bold">{{ selectedClass.classCode }}</span> đang có <span class="font-bold">{{ selectedClass.studentCount }}</span> học viên.</div>
-          <div>Bạn muốn gộp (chuyển) tất cả học viên của lớp này sang lớp nào khác thuộc cùng một lịch học?</div>
+        <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 text-xs text-orange-800 space-y-1" v-html="$t('planning.dialog_merge_desc', { code: '<span class=\'font-bold\'>' + selectedClass.classCode + '</span>', count: '<span class=\'font-bold\'>' + selectedClass.studentCount + '</span>' })">
         </div>
 
         <el-form label-position="top">
-          <el-form-item label="Chọn lớp đích để gộp vào" required>
-            <el-select v-model="mergeTargetClassId" placeholder="Chọn lớp đích..." class="w-full">
+          <el-form-item :label="$t('planning.dialog_merge_label')" required>
+            <el-select v-model="mergeTargetClassId" :placeholder="$t('planning.dialog_merge_placeholder')" class="w-full">
               <el-option
                 v-for="c in getAvailableMergeTargets(selectedClass)"
                 :key="c.id"
-                :label="`${c.classCode} (${c.studentCount ?? 0} học viên)`"
+                :label="$t('planning.dialog_merge_option', { code: c.classCode, count: c.studentCount ?? 0 })"
                 :value="c.id!"
               />
             </el-select>
@@ -419,9 +415,9 @@
       </div>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <el-button @click="mergeDialogVisible = false">Hủy</el-button>
+          <el-button @click="mergeDialogVisible = false">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" :loading="merging" @click="executeMerge" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
-            Xác nhận gộp lớp
+            {{ $t('planning.btn_confirm_merge') }}
           </el-button>
         </div>
       </template>
@@ -435,6 +431,10 @@ import api from '@/api/axios';
 import type { CourseBatch, CapacityDashboardItem, SchoolClass } from '@/types';
 import { Calendar, SetUp, ArrowDown, Cpu } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 
 // ---- State ----
 const activeBatches = ref<CourseBatch[]>([]);
@@ -480,7 +480,7 @@ const fetchActiveBatches = async () => {
       );
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi tải danh sách kế hoạch khai giảng');
+    ElMessage.error(t('planning.error_load_batches'));
   }
 };
 
@@ -503,7 +503,7 @@ const fetchCapacityDashboard = async (courseId: number) => {
       capacityDashboard.value = Array.isArray(res.data) ? res.data : [];
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi tải bảng công suất rảnh thực tế');
+    ElMessage.error(t('planning.error_load_capacity'));
   } finally {
     capacityLoading.value = false;
   }
@@ -520,7 +520,7 @@ const fetchClasses = async () => {
       classes.value = Array.isArray(res.data) ? res.data : (res.data.content ?? []);
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi tải danh sách lớp học');
+    ElMessage.error(t('planning.error_load_classes'));
   } finally {
     classesLoading.value = false;
   }
@@ -533,11 +533,11 @@ const handleSmartGenerate = async () => {
 
   try {
     await ElMessageBox.confirm(
-      'Hệ thống sẽ tự động tính toán số lượng lớp cần mở dựa trên quy mô và phân bổ vào các ca học phù hợp nhất dựa trên phòng học và giáo viên rảnh thực tế. Bạn có chắc chắn muốn thực hiện?',
-      'Lập kế hoạch tự động (Phù hợp nhất)',
+      t('planning.auto_plan_confirm_text'),
+      t('planning.auto_plan_confirm_title'),
       {
-        confirmButtonText: 'Bắt đầu lập kế hoạch',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('planning.auto_plan_confirm_btn'),
+        cancelButtonText: t('common.cancel'),
         type: 'success'
       }
     );
@@ -548,7 +548,7 @@ const handleSmartGenerate = async () => {
     });
 
     if (res.success) {
-      ElMessage.success(`Tự động lập kế hoạch mở lớp thành công! Đã tạo ${res.data?.length ?? 0} lớp bản nháp (DRAFT).`);
+      ElMessage.success(t('planning.auto_plan_success', { count: res.data?.length ?? 0 }));
       
       // Load lại dashboard capacity và danh sách lớp
       if (selectedBatch.value) {
@@ -560,11 +560,11 @@ const handleSmartGenerate = async () => {
       }
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Lập kế hoạch tự động thất bại');
+      ElMessage.error(res.message || t('planning.auto_plan_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Có lỗi hệ thống khi lập kế hoạch tự động');
+      ElMessage.error(err.response?.data?.message || t('planning.auto_plan_failed'));
     }
   } finally {
     smartGenerating.value = false;
@@ -589,7 +589,7 @@ const generateDraftClasses = async () => {
     });
 
     if (res.success) {
-      ElMessage.success(`Đã tạo thành công ${classesToGenerate.value} lớp bản nháp (DRAFT)`);
+      ElMessage.success(t('planning.draft_create_success', { count: classesToGenerate.value }));
       selectedPatternItem.value = null;
       classesToGenerate.value = 1;
       
@@ -599,10 +599,10 @@ const generateDraftClasses = async () => {
       }
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Lỗi khi tạo lớp học nháp');
+      ElMessage.error(res.message || t('planning.draft_create_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi hệ thống khi tạo lớp nháp');
+    ElMessage.error(err.response?.data?.message || t('planning.draft_create_failed'));
   } finally {
     generating.value = false;
   }
@@ -614,11 +614,11 @@ const activateEnrollment = async () => {
 
   try {
     await ElMessageBox.confirm(
-      'Xác nhận kích hoạt tuyển sinh cho toàn bộ lớp DRAFT? Trạng thái các lớp này sẽ chuyển sang ENROLLING.',
-      'Xác nhận kích hoạt tuyển sinh',
+      t('planning.activate_confirm_text'),
+      t('planning.activate_confirm_title'),
       {
-        confirmButtonText: 'Xác nhận',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'info'
       }
     );
@@ -626,14 +626,14 @@ const activateEnrollment = async () => {
     classesLoading.value = true;
     const res: any = await api.post(`/class-planning/batches/${selectedBatchId.value}/activate-enrollment`);
     if (res.success) {
-      ElMessage.success('Kích hoạt tuyển sinh thành công');
+      ElMessage.success(t('planning.activate_success'));
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi khi kích hoạt tuyển sinh');
+      ElMessage.error(err.response?.data?.message || t('common.error'));
     }
   } finally {
     classesLoading.value = false;
@@ -657,14 +657,14 @@ const saveStudentCount = async () => {
     });
 
     if (res.success) {
-      ElMessage.success('Cập nhật sĩ số thành công');
+      ElMessage.success(t('planning.student_count_success'));
       studentCountDialogVisible.value = false;
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Lỗi khi cập nhật sĩ số');
+    ElMessage.error(err.response?.data?.message || t('common.error'));
   } finally {
     updatingCount.value = false;
   }
@@ -676,11 +676,11 @@ const handleRebalanceCommand = async (patternId: number) => {
 
   try {
     await ElMessageBox.confirm(
-      `Xác nhận thực hiện thuật toán cân bằng và phân bổ sĩ số cho các lớp học có lịch học này?`,
-      'Cân bằng sĩ số',
+      t('planning.rebalance_confirm_text'),
+      t('planning.rebalance_confirm_title'),
       {
-        confirmButtonText: 'Bắt đầu',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('planning.rebalance_confirm_btn'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     );
@@ -691,14 +691,14 @@ const handleRebalanceCommand = async (patternId: number) => {
     });
 
     if (res.success) {
-      ElMessage.success(res.data?.message || 'Cân bằng sĩ số thành công');
+      ElMessage.success(res.data?.message || t('planning.rebalance_confirm_title') + ' ' + t('common.success'));
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác thất bại');
+      ElMessage.error(res.message || t('common.error'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi cân bằng sĩ số');
+      ElMessage.error(err.response?.data?.message || t('common.error'));
     }
   } finally {
     classesLoading.value = false;
@@ -709,11 +709,11 @@ const handleRebalanceCommand = async (patternId: number) => {
 const openClass = async (classItem: SchoolClass) => {
   try {
     await ElMessageBox.confirm(
-      `Xác nhận mở lớp học chính thức "${classItem.classCode}"? Lớp sẽ được gửi sang Solver xếp lịch.`,
-      'Xác nhận mở lớp',
+      t('planning.open_confirm_text', { code: classItem.classCode }),
+      t('planning.open_confirm_title'),
       {
-        confirmButtonText: 'Xác nhận mở',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('planning.open_confirm_btn'),
+        cancelButtonText: t('common.cancel'),
         type: 'success'
       }
     );
@@ -721,14 +721,14 @@ const openClass = async (classItem: SchoolClass) => {
     classesLoading.value = true;
     const res: any = await api.post(`/class-planning/classes/${classItem.id}/open`);
     if (res.success) {
-      ElMessage.success('Đã mở lớp học thành công');
+      ElMessage.success(t('planning.open_success'));
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác mở lớp thất bại');
+      ElMessage.error(res.message || t('planning.open_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi mở lớp');
+      ElMessage.error(err.response?.data?.message || t('planning.open_failed'));
     }
   } finally {
     classesLoading.value = false;
@@ -739,11 +739,11 @@ const openClass = async (classItem: SchoolClass) => {
 const forceOpenClass = async (classItem: SchoolClass) => {
   try {
     await ElMessageBox.confirm(
-      `Sĩ số của lớp (${classItem.studentCount}) hiện đang thấp hơn mức chuẩn tối thiểu (${selectedBatchForecastMin.value}). Bạn có chắc chắn muốn BUỘC mở lớp học này?`,
-      'Buộc mở lớp (Force Open)',
+      t('planning.force_open_confirm_text', { count: classItem.studentCount, min: selectedBatchForecastMin.value }),
+      t('planning.force_open_confirm_title'),
       {
-        confirmButtonText: 'Chấp nhận buộc mở',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('planning.force_open_confirm_btn'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     );
@@ -751,14 +751,14 @@ const forceOpenClass = async (classItem: SchoolClass) => {
     classesLoading.value = true;
     const res: any = await api.post(`/class-planning/classes/${classItem.id}/force-open`);
     if (res.success) {
-      ElMessage.success('Buộc mở lớp học thành công');
+      ElMessage.success(t('planning.force_open_success'));
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác buộc mở lớp thất bại');
+      ElMessage.error(res.message || t('planning.force_open_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi buộc mở lớp');
+      ElMessage.error(err.response?.data?.message || t('planning.force_open_failed'));
     }
   } finally {
     classesLoading.value = false;
@@ -769,33 +769,33 @@ const forceOpenClass = async (classItem: SchoolClass) => {
 const cancelClass = async (classItem: SchoolClass) => {
   try {
     const { value: reason } = await ElMessageBox.prompt(
-      `Bạn có chắc chắn muốn hủy bỏ lớp học "${classItem.classCode}"? Hãy nhập lý do hủy lớp.`,
-      'Hủy lớp học',
+      t('planning.cancel_confirm_text', { code: classItem.classCode }),
+      t('planning.cancel_confirm_title'),
       {
-        confirmButtonText: 'Xác nhận hủy lớp',
-        cancelButtonText: 'Quay lại',
-        inputPlaceholder: 'Lý do hủy (ví dụ: sĩ số quá ít không gộp được lớp)...',
+        confirmButtonText: t('planning.cancel_confirm_btn'),
+        cancelButtonText: t('planning.cancel_confirm_back'),
+        inputPlaceholder: t('planning.cancel_placeholder'),
         type: 'error'
       }
     );
 
     classesLoading.value = true;
     const res: any = await api.post(`/class-planning/classes/${classItem.id}/cancel`, {
-      reason: reason || 'Hủy do yêu cầu của quản lý'
+      reason: reason || t('planning.cancel_default_reason')
     });
 
     if (res.success) {
-      ElMessage.success('Đã hủy lớp học thành công');
+      ElMessage.success(t('planning.cancel_success'));
       if (selectedBatch.value) {
         await fetchCapacityDashboard(selectedBatch.value.courseId);
       }
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Hủy lớp học thất bại');
+      ElMessage.error(res.message || t('planning.cancel_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi hủy lớp');
+      ElMessage.error(err.response?.data?.message || t('planning.cancel_failed'));
     }
   } finally {
     classesLoading.value = false;
@@ -820,18 +820,19 @@ const executeMerge = async () => {
     });
 
     if (res.success) {
-      ElMessage.success('Gộp lớp thành công! Toàn bộ học viên đã được gom vào lớp mới.');
+      ElMessage.success(t('planning.merge_success'));
       mergeDialogVisible.value = false;
       await fetchClasses();
     } else {
-      ElMessage.error(res.message || 'Thao tác gộp lớp thất bại');
+      ElMessage.error(res.message || t('planning.merge_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Lỗi hệ thống khi gộp lớp');
+    ElMessage.error(err.response?.data?.message || t('planning.merge_failed'));
   } finally {
     merging.value = false;
   }
 };
+
 
 // ---- Helpers ----
 
@@ -888,11 +889,11 @@ const getBatchStatusType = (status?: string) => {
 
 const getBatchStatusLabel = (status?: string) => {
   const map: Record<string, string> = {
-    PLANNING: 'Đang lên kế hoạch',
-    ENROLLING: 'Đang tuyển sinh',
-    OPENED: 'Đã mở khóa học',
-    CLOSED: 'Đã đóng kế hoạch',
-    CANCELLED: 'Đã hủy'
+    PLANNING: t('batch.status_planning'),
+    ENROLLING: t('batch.status_enrolling'),
+    OPENED: t('batch.status_opened'),
+    CLOSED: t('batch.status_closed'),
+    CANCELLED: t('batch.status_cancelled')
   };
   return map[status ?? ''] ?? status ?? '—';
 };

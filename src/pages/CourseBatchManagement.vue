@@ -5,9 +5,9 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-          Kế hoạch Khai giảng
+          {{ $t('batch.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Quản lý kế hoạch khai giảng các khóa học theo từng đợt tuyển sinh.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('batch.desc') }}</p>
       </div>
       <el-button
         type="primary"
@@ -15,7 +15,7 @@
         class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300"
       >
         <el-icon class="mr-1"><Plus /></el-icon>
-        Tạo kế hoạch
+        {{ $t('batch.btn_create') }}
       </el-button>
     </div>
 
@@ -25,7 +25,7 @@
         <!-- Lọc theo khóa học -->
         <el-select
           v-model="filterCourseId"
-          placeholder="Lọc theo khóa học"
+          :placeholder="$t('batch.filter_course')"
           clearable
           filterable
           class="w-60"
@@ -40,19 +40,19 @@
         </el-select>
 
         <!-- Lọc theo trạng thái -->
-        <el-select v-model="filterStatus" placeholder="Lọc trạng thái" clearable class="w-44" @change="handleSearch">
-          <el-option label="Đang lập kế hoạch" value="PLANNING" />
-          <el-option label="Đang tuyển sinh" value="ENROLLING" />
-          <el-option label="Đã mở khóa" value="OPENED" />
-          <el-option label="Đã đóng" value="CLOSED" />
-          <el-option label="Đã hủy" value="CANCELLED" />
+        <el-select v-model="filterStatus" :placeholder="$t('batch.filter_status')" clearable class="w-44" @change="handleSearch">
+          <el-option :label="$t('batch.status_planning')" value="PLANNING" />
+          <el-option :label="$t('batch.status_enrolling')" value="ENROLLING" />
+          <el-option :label="$t('batch.status_opened')" value="OPENED" />
+          <el-option :label="$t('batch.status_closed')" value="CLOSED" />
+          <el-option :label="$t('batch.status_cancelled')" value="CANCELLED" />
         </el-select>
 
         <!-- Lọc theo ngày khai giảng dự kiến -->
         <el-date-picker
           v-model="filterOpeningDate"
           type="date"
-          placeholder="Lọc ngày khai giảng"
+          :placeholder="$t('batch.filter_date')"
           format="DD/MM/YYYY"
           value-format="YYYY-MM-DD"
           class="!w-48"
@@ -61,7 +61,7 @@
 
         <el-button @click="resetSearch">
           <el-icon class="mr-1"><Refresh /></el-icon>
-          Đặt lại
+          {{ $t('common.reset_btn') }}
         </el-button>
       </div>
     </el-card>
@@ -76,7 +76,7 @@
         class="premium-table"
       >
         <!-- Tên kế hoạch -->
-        <el-table-column prop="batchName" label="Tên kế hoạch" min-width="160">
+        <el-table-column prop="batchName" :label="$t('batch.col_name')" min-width="160">
           <template #default="{ row }">
             <div class="font-bold text-gray-900 hover:text-emerald-600 transition-colors">
               {{ row.batchName }}
@@ -85,7 +85,7 @@
         </el-table-column>
 
         <!-- Khóa học -->
-        <el-table-column label="Khóa học" min-width="180">
+        <el-table-column :label="$t('batch.col_course')" min-width="180">
           <template #default="{ row }">
             <div class="flex flex-col gap-0.5">
               <span class="font-semibold text-gray-800">{{ row.courseName }}</span>
@@ -100,14 +100,14 @@
         </el-table-column>
 
         <!-- Thời gian tuyển sinh -->
-        <el-table-column label="Thời gian tuyển sinh" width="200">
+        <el-table-column :label="$t('batch.col_period')" width="200">
           <template #default="{ row }">
             <div class="text-sm text-gray-600">
               <div v-if="row.enrollmentStartDate">
-                <span class="text-xs text-gray-400">Từ:</span> {{ formatDate(row.enrollmentStartDate) }}
+                <span class="text-xs text-gray-400">{{ $t('batch.col_from') }}</span> {{ formatDate(row.enrollmentStartDate) }}
               </div>
               <div v-if="row.enrollmentEndDate">
-                <span class="text-xs text-gray-400">Đến:</span> {{ formatDate(row.enrollmentEndDate) }}
+                <span class="text-xs text-gray-400">{{ $t('batch.col_to') }}</span> {{ formatDate(row.enrollmentEndDate) }}
               </div>
               <span v-if="!row.enrollmentStartDate && !row.enrollmentEndDate" class="text-gray-400 text-xs">—</span>
             </div>
@@ -115,24 +115,24 @@
         </el-table-column>
 
         <!-- Ngày khai giảng dự kiến -->
-        <el-table-column label="Khai giảng dự kiến" width="160" align="center">
+        <el-table-column :label="$t('batch.col_expected_date')" width="160" align="center">
           <template #default="{ row }">
             <span v-if="row.expectedOpeningDate" class="text-sm font-semibold text-teal-700">
               {{ formatDate(row.expectedOpeningDate) }}
             </span>
-            <span v-else class="text-gray-400 text-xs">Chưa xác định</span>
+            <span v-else class="text-gray-400 text-xs">{{ $t('batch.col_not_set') }}</span>
           </template>
         </el-table-column>
 
         <!-- Quy mô dự kiến -->
-        <el-table-column prop="forecastScale" label="Quy mô" width="100" align="center">
+        <el-table-column prop="forecastScale" :label="$t('batch.col_scale')" width="100" align="center">
           <template #default="{ row }">
             <span class="font-semibold">{{ row.forecastScale ?? '—' }}</span>
           </template>
         </el-table-column>
 
         <!-- Trạng thái -->
-        <el-table-column label="Trạng thái" width="140" align="center">
+        <el-table-column :label="$t('batch.col_status')" width="140" align="center">
           <template #default="{ row }">
             <el-tag :type="getBatchStatusType(row.status)" effect="dark" class="font-bold rounded-md">
               {{ getBatchStatusLabel(row.status) }}
@@ -141,25 +141,25 @@
         </el-table-column>
 
         <!-- Thao tác -->
-        <el-table-column label="Thao tác" width="240" fixed="right">
+        <el-table-column :label="$t('batch.col_actions')" width="240" fixed="right">
           <template #default="{ row }">
             <div class="flex items-center gap-1.5 flex-wrap">
               <!-- Nút xem chi tiết -->
-              <el-tooltip content="Xem chi tiết" placement="top">
+              <el-tooltip :content="$t('common.view')" placement="top">
                 <el-button type="info" link @click="viewDetails(row)">
                   <el-icon :size="15"><View /></el-icon>
                 </el-button>
               </el-tooltip>
 
               <!-- Nút chỉnh sửa -->
-              <el-tooltip content="Chỉnh sửa" placement="top">
+              <el-tooltip :content="$t('common.edit')" placement="top">
                 <el-button type="primary" link @click="openDrawer(row)">
                   <el-icon :size="15"><Edit /></el-icon>
                 </el-button>
               </el-tooltip>
 
               <!-- Nút xóa -->
-              <el-tooltip content="Xóa" placement="top">
+              <el-tooltip :content="$t('common.delete')" placement="top">
                 <el-button type="danger" link @click="deleteBatch(row)">
                   <el-icon :size="15"><Delete /></el-icon>
                 </el-button>
@@ -173,7 +173,7 @@
                 @click="transitionStatus(row, 'ENROLLING')"
                 class="!text-xs"
               >
-                Bắt đầu TS
+                {{ $t('batch.btn_start_enrollment') }}
               </el-button>
               <el-button
                 v-if="row.status === 'ENROLLING'"
@@ -182,7 +182,7 @@
                 @click="transitionStatus(row, 'OPENED')"
                 class="!bg-emerald-600 !border-emerald-600 !text-xs"
               >
-                Mở khóa
+                {{ $t('batch.btn_open_course') }}
               </el-button>
               <el-button
                 v-if="row.status === 'OPENED'"
@@ -191,27 +191,27 @@
                 @click="transitionStatus(row, 'CLOSED')"
                 class="!text-xs"
               >
-                Đóng
+                {{ $t('batch.btn_close_plan') }}
               </el-button>
             </div>
           </template>
         </el-table-column>
 
         <template #empty>
-          <el-empty description="Chưa có kế hoạch khai giảng nào" />
+          <el-empty :description="$t('batch.empty')" />
         </template>
       </el-table>
 
       <!-- Phân trang -->
       <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50">
-        <div class="text-xs text-gray-500">Tổng cộng {{ batches.length }} kế hoạch</div>
+        <div class="text-xs text-gray-500">{{ $t('batch.total_count', { count: batches.length }) }}</div>
       </div>
     </el-card>
 
     <!-- Drawer tạo/sửa kế hoạch -->
     <el-drawer
       v-model="showDrawer"
-      :title="currentBatch.id ? 'Cập nhật Kế hoạch Khai giảng' : 'Tạo Kế hoạch Khai giảng mới'"
+      :title="currentBatch.id ? $t('batch.edit_title') : $t('batch.create_title')"
       size="50%"
       @close="closeDrawer"
       custom-class="premium-drawer"
@@ -224,15 +224,15 @@
         :rules="formRules"
       >
         <!-- Tên kế hoạch -->
-        <el-form-item label="Tên kế hoạch" prop="batchName" required class="col-span-2">
-          <el-input v-model="currentBatch.batchName" placeholder="VD: IELTS T7/2025 - Lớp A" />
+        <el-form-item :label="$t('batch.form_name')" prop="batchName" required class="col-span-2">
+          <el-input v-model="currentBatch.batchName" :placeholder="$t('batch.form_name_placeholder')" />
         </el-form-item>
 
         <!-- Khóa học -->
-        <el-form-item label="Khóa học" prop="courseId" required class="col-span-2">
+        <el-form-item :label="$t('batch.form_course')" prop="courseId" required class="col-span-2">
           <el-select
             v-model="currentBatch.courseId"
-            placeholder="Chọn khóa học..."
+            :placeholder="$t('batch.form_course_placeholder')"
             filterable
             class="w-full"
           >
@@ -246,11 +246,11 @@
         </el-form-item>
 
         <!-- Ngày bắt đầu tuyển sinh -->
-        <el-form-item label="Ngày bắt đầu tuyển sinh">
+        <el-form-item :label="$t('batch.form_start_date')">
           <el-date-picker
             v-model="currentBatch.enrollmentStartDate"
             type="date"
-            placeholder="Chọn ngày..."
+            :placeholder="$t('batch.form_date_placeholder')"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
             class="w-full"
@@ -258,11 +258,11 @@
         </el-form-item>
 
         <!-- Ngày kết thúc tuyển sinh -->
-        <el-form-item label="Ngày kết thúc tuyển sinh">
+        <el-form-item :label="$t('batch.form_end_date')">
           <el-date-picker
             v-model="currentBatch.enrollmentEndDate"
             type="date"
-            placeholder="Chọn ngày..."
+            :placeholder="$t('batch.form_date_placeholder')"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
             class="w-full"
@@ -270,11 +270,11 @@
         </el-form-item>
 
         <!-- Ngày khai giảng dự kiến -->
-        <el-form-item label="Ngày khai giảng dự kiến" class="col-span-2">
+        <el-form-item :label="$t('batch.form_expected_date')" class="col-span-2">
           <el-date-picker
             v-model="currentBatch.expectedOpeningDate"
             type="date"
-            placeholder="Chọn ngày khai giảng dự kiến..."
+            :placeholder="$t('batch.form_expected_placeholder')"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
             class="w-full"
@@ -282,24 +282,24 @@
         </el-form-item>
 
         <!-- Quy mô dự kiến -->
-        <el-form-item label="Quy mô dự kiến (học viên)">
+        <el-form-item :label="$t('batch.form_scale')">
           <el-input-number v-model="currentBatch.forecastScale" :min="1" class="w-full" />
         </el-form-item>
 
         <!-- Ghi chú -->
-        <el-form-item label="Ghi chú" class="col-span-2">
+        <el-form-item :label="$t('batch.form_note')" class="col-span-2">
           <el-input
             v-model="currentBatch.note"
             type="textarea"
             :rows="3"
-            placeholder="Nhập ghi chú cho kế hoạch khai giảng..."
+            :placeholder="$t('batch.form_note_placeholder')"
           />
         </el-form-item>
       </el-form>
 
       <template #footer>
         <div class="flex justify-end gap-2 p-4 border-t border-gray-100">
-          <el-button @click="closeDrawer">Hủy bỏ</el-button>
+          <el-button @click="closeDrawer">{{ $t('common.cancel') }}</el-button>
           <el-button
             type="primary"
             :loading="saving"
@@ -307,7 +307,7 @@
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600"
           >
             <el-icon class="mr-1"><Check /></el-icon>
-            {{ currentBatch.id ? 'Cập nhật' : 'Tạo mới' }}
+            {{ currentBatch.id ? $t('common.edit') : $t('common.add') }}
           </el-button>
         </div>
       </template>
@@ -316,7 +316,7 @@
     <!-- Dialog xem chi tiết kế hoạch -->
     <el-dialog
       v-model="showDetailsDialog"
-      title="Chi tiết Kế hoạch Khai giảng"
+      :title="$t('batch.detail_title')"
       width="500px"
       destroy-on-close
       custom-class="premium-dialog"
@@ -332,40 +332,40 @@
         </div>
 
         <div class="grid grid-cols-3 gap-y-3 text-sm">
-          <div class="text-gray-500 font-medium">Khóa học:</div>
+          <div class="text-gray-500 font-medium">{{ $t('batch.detail_course') }}</div>
           <div class="col-span-2 text-gray-900 font-semibold">
             [{{ selectedBatch.courseCode }}] {{ selectedBatch.courseName }}
           </div>
 
-          <div class="text-gray-500 font-medium">Quy mô tuyển sinh:</div>
-          <div class="col-span-2 text-gray-900">{{ selectedBatch.forecastScale ?? '—' }} học viên</div>
+          <div class="text-gray-500 font-medium">{{ $t('batch.detail_scale') }}</div>
+          <div class="col-span-2 text-gray-900">{{ $t('batch.detail_scale_val', { count: selectedBatch.forecastScale ?? 0 }) }}</div>
 
-          <div class="text-gray-500 font-medium">Số lớp đã sinh:</div>
+          <div class="text-gray-500 font-medium">{{ $t('batch.detail_generated') }}</div>
           <div class="col-span-2 text-emerald-600 font-bold">
-            {{ selectedBatch.generatedClassCount ?? 0 }} lớp
+            {{ $t('batch.detail_generated_val', { count: selectedBatch.generatedClassCount ?? 0 }) }}
           </div>
 
-          <div class="text-gray-500 font-medium">Thời gian tuyển sinh:</div>
+          <div class="text-gray-500 font-medium">{{ $t('batch.detail_enroll_time') }}</div>
           <div class="col-span-2 text-gray-900">
-            <span v-if="selectedBatch.enrollmentStartDate">Từ: {{ formatDate(selectedBatch.enrollmentStartDate) }}</span>
-            <span v-if="selectedBatch.enrollmentEndDate"><br />Đến: {{ formatDate(selectedBatch.enrollmentEndDate) }}</span>
+            <span v-if="selectedBatch.enrollmentStartDate">{{ $t('batch.detail_from', { date: formatDate(selectedBatch.enrollmentStartDate) }) }}</span>
+            <span v-if="selectedBatch.enrollmentEndDate"><br />{{ $t('batch.detail_to', { date: formatDate(selectedBatch.enrollmentEndDate) }) }}</span>
             <span v-if="!selectedBatch.enrollmentStartDate && !selectedBatch.enrollmentEndDate">—</span>
           </div>
 
-          <div class="text-gray-500 font-medium">Khai giảng dự kiến:</div>
+          <div class="text-gray-500 font-medium">{{ $t('batch.detail_expected') }}</div>
           <div class="col-span-2 text-teal-700 font-semibold">
             {{ formatDate(selectedBatch.expectedOpeningDate) }}
           </div>
 
-          <div class="text-gray-500 font-medium col-span-3">Ghi chú:</div>
+          <div class="text-gray-500 font-medium col-span-3">{{ $t('batch.detail_notes') }}</div>
           <div class="col-span-3 bg-gray-50 p-3 rounded-lg border border-gray-100 text-gray-700 italic min-h-[60px] whitespace-pre-wrap">
-            {{ selectedBatch.note || 'Không có ghi chú' }}
+            {{ selectedBatch.note || $t('batch.detail_no_notes') }}
           </div>
         </div>
       </div>
       <template #footer>
         <div class="flex justify-end">
-          <el-button @click="showDetailsDialog = false">Đóng</el-button>
+          <el-button @click="showDetailsDialog = false">{{ $t('common.close') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -379,6 +379,9 @@ import type { CourseBatch, Course } from '@/types';
 import { Plus, Edit, Refresh, Check, View, Delete } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import type { FormInstance } from 'element-plus';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 // ---- State ----
 const batches = ref<CourseBatch[]>([]);
@@ -405,8 +408,8 @@ const currentBatch = ref<CourseBatch>({
 });
 
 const formRules = {
-  batchName: [{ required: true, message: 'Tên kế hoạch không được để trống', trigger: 'blur' }],
-  courseId: [{ required: true, message: 'Vui lòng chọn khóa học', trigger: 'change' }]
+  batchName: [{ required: true, message: t('batch.rule_name_required'), trigger: 'blur' }],
+  courseId: [{ required: true, message: t('batch.rule_course_required'), trigger: 'change' }]
 };
 
 // ---- API ----
@@ -425,7 +428,7 @@ const fetchBatches = async () => {
       batches.value = Array.isArray(res.data) ? res.data : (res.data.content ?? []);
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi tải danh sách kế hoạch khai giảng');
+    ElMessage.error(t('planning.error_load_batches'));
   } finally {
     loading.value = false;
   }
@@ -482,25 +485,25 @@ const viewDetails = (batch: CourseBatch) => {
 const deleteBatch = async (batch: CourseBatch) => {
   try {
     await ElMessageBox.confirm(
-      `Bạn có chắc chắn muốn xóa kế hoạch khai giảng "${batch.batchName}" không? Hành động này không thể hoàn tác.`,
-      'Xác nhận xóa kế hoạch',
+      t('batch.delete_confirm_text', { name: batch.batchName }),
+      t('batch.delete_confirm_title'),
       {
-        confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('common.delete'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     );
 
     const res: any = await api.delete(`/course-batches/${batch.id}`);
     if (res.success) {
-      ElMessage.success('Xóa kế hoạch khai giảng thành công');
+      ElMessage.success(t('batch.delete_success'));
       fetchBatches();
     } else {
-      ElMessage.error(res.message || 'Xóa thất bại');
+      ElMessage.error(res.message || t('batch.delete_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi xóa kế hoạch khai giảng');
+      ElMessage.error(err.response?.data?.message || t('batch.delete_failed'));
     }
   }
 };
@@ -525,14 +528,14 @@ const saveBatch = async () => {
       }
 
       if (res.success) {
-        ElMessage.success(currentBatch.value.id ? 'Cập nhật thành công' : 'Tạo kế hoạch thành công');
+        ElMessage.success(currentBatch.value.id ? t('batch.save_success_edit') : t('batch.save_success_create'));
         closeDrawer();
         fetchBatches();
       } else {
-        ElMessage.error(res.message || 'Lưu thất bại');
+        ElMessage.error(res.message || t('common.error'));
       }
     } catch (err: any) {
-      ElMessage.error(err.response?.data?.message || 'Lỗi máy chủ');
+      ElMessage.error(err.response?.data?.message || t('common.error'));
     } finally {
       saving.value = false;
     }
@@ -542,33 +545,33 @@ const saveBatch = async () => {
 /** Chuyển trạng thái kế hoạch */
 const transitionStatus = async (batch: CourseBatch, newStatus: string) => {
   const actionLabels: Record<string, string> = {
-    ENROLLING: 'bắt đầu tuyển sinh',
-    OPENED: 'mở khóa học',
-    CLOSED: 'đóng kế hoạch'
+    ENROLLING: t('batch.action_start_enroll'),
+    OPENED: t('batch.action_open_course'),
+    CLOSED: t('batch.action_close_plan')
   };
   const label = actionLabels[newStatus] || 'thay đổi trạng thái';
 
   try {
     await ElMessageBox.confirm(
-      `Xác nhận ${label} kế hoạch "${batch.batchName}"?`,
-      'Xác nhận chuyển trạng thái',
+      t('batch.transition_confirm_text', { action: label, name: batch.batchName }),
+      t('batch.transition_confirm_title'),
       {
-        confirmButtonText: 'Xác nhận',
-        cancelButtonText: 'Hủy',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     );
 
     const res: any = await api.patch(`/course-batches/${batch.id}/status`, { status: newStatus });
     if (res.success) {
-      ElMessage.success(`Đã ${label} thành công`);
+      ElMessage.success(t('batch.transition_success', { action: label }));
       fetchBatches();
     } else {
-      ElMessage.error(res.message || 'Thao tác thất bại');
+      ElMessage.error(res.message || t('batch.transition_failed'));
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Lỗi khi chuyển trạng thái');
+      ElMessage.error(err.response?.data?.message || t('batch.transition_failed'));
     }
   }
 };
@@ -594,11 +597,11 @@ const getBatchStatusType = (status?: string) => {
 
 const getBatchStatusLabel = (status?: string) => {
   const map: Record<string, string> = {
-    PLANNING: 'Lập kế hoạch',
-    ENROLLING: 'Tuyển sinh',
-    OPENED: 'Đã mở',
-    CLOSED: 'Đã đóng',
-    CANCELLED: 'Đã hủy'
+    PLANNING: t('batch.status_planning'),
+    ENROLLING: t('batch.status_enrolling'),
+    OPENED: t('batch.status_opened'),
+    CLOSED: t('batch.status_closed'),
+    CANCELLED: t('batch.status_cancelled')
   };
   return map[status ?? ''] ?? status ?? '—';
 };

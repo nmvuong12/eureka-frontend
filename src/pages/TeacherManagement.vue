@@ -7,7 +7,7 @@
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
           {{ $t('teacher.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Quản lý hồ sơ, lịch dạy và trình độ chuyên môn của giáo viên.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('teacher.desc_page') }}</p>
       </div>
       <el-button type="primary" @click="openModal()" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md transition-all duration-300">
         <el-icon class="mr-1"><Plus /></el-icon>
@@ -20,7 +20,7 @@
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
           <el-icon class="text-emerald-500"><Search /></el-icon>
-          Bộ lọc nâng cao
+          {{ $t('common.filter_advanced') }}
         </h2>
         <div class="flex items-center gap-2">
           <el-button type="primary" @click="handleSearch" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
@@ -36,22 +36,22 @@
       
       <el-row :gutter="20" class="row-gap-4">
         <el-col :xs="24" :sm="12" :md="6" class="mb-4">
-          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mã giáo viên</div>
-          <el-input v-model="searchFilters.teacherCode" placeholder="Ví dụ: GV0001" clearable @keyup.enter="handleSearch" />
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('teacher.id') }}</div>
+          <el-input v-model="searchFilters.teacherCode" :placeholder="$t('teacher.placeholder_code')" clearable @keyup.enter="handleSearch" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6" class="mb-4">
           <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('teacher.name') }}</div>
-          <el-input v-model="searchFilters.fullName" placeholder="Nhập tên giáo viên..." clearable @keyup.enter="handleSearch" />
+          <el-input v-model="searchFilters.fullName" :placeholder="$t('teacher.placeholder_name')" clearable @keyup.enter="handleSearch" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6" class="mb-4">
           <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('teacher.skills') }}</div>
-          <el-input v-model="searchFilters.skill" placeholder="Ví dụ: IELTS, TOEFL" clearable @keyup.enter="handleSearch" />
+          <el-input v-model="searchFilters.skill" :placeholder="$t('teacher.placeholder_skills')" clearable @keyup.enter="handleSearch" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6" class="mb-4">
-          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Loại giáo viên</div>
-          <el-select v-model="searchFilters.teacherType" placeholder="Tất cả" clearable class="w-full">
-            <el-option label="Full-time" value="FULL_TIME" />
-            <el-option label="Part-time (Bán thời gian)" value="PART_TIME" />
+          <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('teacher.type') }}</div>
+          <el-select v-model="searchFilters.teacherType" :placeholder="$t('common.all')" clearable class="w-full">
+            <el-option :label="$t('dashboard.teacher_fulltime')" value="FULL_TIME" />
+            <el-option :label="$t('dashboard.teacher_parttime')" value="PART_TIME" />
           </el-select>
         </el-col>
       </el-row>
@@ -59,10 +59,10 @@
       <el-row :gutter="20">
         <el-col :xs="24" :sm="12" :md="6">
           <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.status') }}</div>
-          <el-select v-model="searchFilters.workingStatus" placeholder="Tất cả" clearable class="w-full">
-            <el-option label="Đang hoạt động (ACTIVE)" value="ACTIVE" />
-            <el-option label="Tạm khóa (INACTIVE)" value="INACTIVE" />
-            <el-option label="Nghỉ phép dài hạn (ON_LEAVE)" value="ON_LEAVE" />
+          <el-select v-model="searchFilters.workingStatus" :placeholder="$t('common.all')" clearable class="w-full">
+            <el-option :label="$t('teacher.status_active')" value="ACTIVE" />
+            <el-option :label="$t('teacher.status_inactive')" value="INACTIVE" />
+            <el-option :label="$t('teacher.status_on_leave')" value="ON_LEAVE" />
           </el-select>
         </el-col>
       </el-row>
@@ -72,7 +72,7 @@
     <el-card shadow="sm" class="border border-gray-100 rounded-2xl overflow-hidden" :body-style="{ padding: '0px' }">
       <el-table :data="teachers" style="width: 100%" stripe class="premium-table">
         <!-- Mã GV Column -->
-        <el-table-column prop="teacherCode" label="Mã GV" width="110">
+        <el-table-column prop="teacherCode" :label="$t('teacher.id')" width="110">
           <template #default="{ row }">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
               {{ row.teacherCode }}
@@ -84,21 +84,21 @@
         <el-table-column prop="fullName" :label="$t('teacher.name')" min-width="180">
           <template #default="{ row }">
             <div class="font-bold text-gray-900 hover:text-emerald-600 transition-colors duration-200">{{ row.fullName }}</div>
-            <div class="text-xs text-gray-400 mt-0.5">ID hệ thống: #{{ row.id }}</div>
+            <div class="text-xs text-gray-400 mt-0.5">ID: #{{ row.id }}</div>
           </template>
         </el-table-column>
 
         <!-- Loại Hợp Đồng Column -->
-        <el-table-column label="Loại Hợp Đồng" width="130">
+        <el-table-column :label="$t('teacher.contract_type')" width="130">
           <template #default="{ row }">
             <el-tag :type="row.teacherType === 'FULL_TIME' ? 'success' : 'warning'" effect="light" class="font-bold rounded-lg">
-              {{ row.teacherType === 'FULL_TIME' ? 'Full-Time' : 'Part-Time' }}
+              {{ row.teacherType === 'FULL_TIME' ? $t('dashboard.teacher_fulltime') : $t('dashboard.teacher_parttime') }}
             </el-tag>
           </template>
         </el-table-column>
 
         <!-- Liên Hệ & Thông Tin Khác Column -->
-        <el-table-column label="Thông tin liên lạc" min-width="220">
+        <el-table-column :label="$t('teacher.contact_info')" min-width="220">
           <template #default="{ row }">
             <div class="flex flex-col gap-1 text-xs">
               <div class="flex items-center gap-1.5 text-gray-600">
@@ -124,7 +124,7 @@
               <el-tag v-for="skill in getSkillList(row.skills)" :key="skill" size="small" effect="plain" type="info" class="!border-gray-200 !text-gray-600 bg-gray-50 rounded-md">
                 {{ skill }}
               </el-tag>
-              <span v-if="!row.skills" class="text-gray-400 text-xs italic">Không có</span>
+              <span v-if="!row.skills" class="text-gray-400 text-xs italic">{{ $t('common.none') }}</span>
             </div>
           </template>
         </el-table-column>
@@ -142,7 +142,7 @@
         <el-table-column :label="$t('common.actions')" width="150" fixed="right">
           <template #default="{ row }">
             <div class="flex items-center gap-1">
-              <el-tooltip content="Xem chi tiết" placement="top">
+              <el-tooltip :content="$t('account.tooltip_detail')" placement="top">
                 <el-button type="info" link @click="openModal(row, true)" class="hover:!text-blue-600">
                   <el-icon :size="16"><View /></el-icon>
                 </el-button>
@@ -150,13 +150,13 @@
               
 
               
-              <el-tooltip content="Chỉnh sửa" placement="top">
+              <el-tooltip :content="$t('common.edit')" placement="top">
                 <el-button type="primary" link @click="openModal(row, false)" class="hover:!text-emerald-600">
                   <el-icon :size="16"><Edit /></el-icon>
                 </el-button>
               </el-tooltip>
 
-              <el-tooltip content="Xóa giáo viên" placement="top">
+              <el-tooltip :content="$t('teacher.tooltip_delete')" placement="top">
                 <el-button type="danger" link @click="deleteTeacher(row.id!)" class="hover:!text-red-600">
                   <el-icon :size="16"><Delete /></el-icon>
                 </el-button>
@@ -166,13 +166,13 @@
         </el-table-column>
         
         <template #empty>
-          <el-empty description="Không tìm thấy giáo viên nào phù hợp" />
+          <el-empty :description="$t('teacher.empty')" />
         </template>
       </el-table>
 
       <!-- Pagination Footer -->
       <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50">
-        <div class="text-xs text-gray-500">Hiển thị trang {{ currentPage }} / tổng số {{ totalElements }} giáo viên.</div>
+        <div class="text-xs text-gray-500">{{ $t('teacher.page_info', { current: currentPage, total: totalElements }) }}</div>
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="itemsPerPage"
@@ -197,55 +197,55 @@
       <el-form :model="currentTeacher" label-position="top" :disabled="isViewOnly" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
         
         <el-form-item :label="$t('teacher.name')" required class="col-span-2">
-          <el-input v-model="currentTeacher.fullName" placeholder="Họ và tên đầy đủ..." />
+          <el-input v-model="currentTeacher.fullName" :placeholder="$t('teacher.placeholder_name_full')" />
         </el-form-item>
 
         <el-form-item :label="$t('teacher.email')" required>
-          <el-input v-model="currentTeacher.email" type="email" placeholder="Địa chỉ email..." />
+          <el-input v-model="currentTeacher.email" type="email" :placeholder="$t('teacher.placeholder_email')" />
         </el-form-item>
 
         <el-form-item :label="$t('teacher.phone')" required>
-          <el-input v-model="currentTeacher.phone" placeholder="Số điện thoại di động..." />
+          <el-input v-model="currentTeacher.phone" :placeholder="$t('teacher.placeholder_phone')" />
         </el-form-item>
 
-        <el-form-item label="Loại hợp đồng giáo viên" required>
+        <el-form-item :label="$t('teacher.contract_type')" required>
           <el-select v-model="currentTeacher.teacherType" class="w-full">
-            <el-option label="Full-Time (Toàn thời gian)" value="FULL_TIME" />
-            <el-option label="Part-Time (Bán thời gian)" value="PART_TIME" />
+            <el-option :label="$t('dashboard.teacher_fulltime')" value="FULL_TIME" />
+            <el-option :label="$t('dashboard.teacher_parttime')" value="PART_TIME" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Giới tính" required>
+        <el-form-item :label="$t('account.gender')" required>
           <el-select v-model="currentTeacher.gender" class="w-full">
-            <el-option label="Nam" value="MALE" />
-            <el-option label="Nữ" value="FEMALE" />
-            <el-option label="Khác" value="OTHER" />
+            <el-option :label="$t('account.male')" value="MALE" />
+            <el-option :label="$t('account.female')" value="FEMALE" />
+            <el-option :label="$t('account.other')" value="OTHER" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Ngày sinh">
-          <el-date-picker v-model="currentTeacher.dateOfBirth" type="date" class="w-full" placeholder="Chọn ngày sinh..." format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
+        <el-form-item :label="$t('account.dob')">
+          <el-date-picker v-model="currentTeacher.dateOfBirth" type="date" class="w-full" :placeholder="$t('teacher.placeholder_dob')" format="DD/MM/YYYY" value-format="YYYY-MM-DD" />
         </el-form-item>
 
         <el-form-item :label="$t('common.status')">
           <el-select v-model="currentTeacher.workingStatus" class="w-full">
-            <el-option label="Đang hoạt động (ACTIVE)" value="ACTIVE" />
-            <el-option label="Tạm khóa (INACTIVE)" value="INACTIVE" />
-            <el-option label="Nghỉ phép (ON_LEAVE)" value="ON_LEAVE" />
+            <el-option :label="$t('teacher.status_active')" value="ACTIVE" />
+            <el-option :label="$t('teacher.status_inactive')" value="INACTIVE" />
+            <el-option :label="$t('teacher.status_on_leave')" value="ON_LEAVE" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Địa chỉ liên hệ" class="col-span-2">
-          <el-input v-model="currentTeacher.address" placeholder="Địa chỉ thường trú hiện tại..." />
+        <el-form-item :label="$t('account.address')" class="col-span-2">
+          <el-input v-model="currentTeacher.address" :placeholder="$t('teacher.placeholder_address')" />
         </el-form-item>
 
-        <el-form-item label="Kỹ năng chuyên môn" class="col-span-2">
+        <el-form-item :label="$t('teacher.skills')" class="col-span-2">
           <el-select
             v-model="selectedSkillsArray"
             multiple
             collapse-tags
             collapse-tags-tooltip
-            placeholder="Chọn các kỹ năng chuyên môn được quản lý..."
+            :placeholder="$t('teacher.skills_placeholder')"
             class="w-full"
             @change="handleSkillsChange"
           >
@@ -259,9 +259,9 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="File hồ sơ cá nhân (Profile File)" class="col-span-2">
+        <el-form-item :label="$t('teacher.profile_file')" class="col-span-2">
           <div class="flex items-center gap-3 w-full">
-            <el-input v-model="currentTeacher.profileFile" placeholder="Chọn file pdf/doc/image..." disabled class="flex-grow" />
+            <el-input v-model="currentTeacher.profileFile" :placeholder="$t('teacher.placeholder_file')" disabled class="flex-grow" />
             <el-upload
               action=""
               :http-request="(options: any) => handleFileUpload(options, 'profileFile')"
@@ -270,19 +270,19 @@
             >
               <el-button type="success" plain :loading="uploadingProfile" class="flex items-center">
                 <el-icon class="mr-1"><Upload /></el-icon>
-                Tải file lên
+                {{ $t('teacher.btn_upload') }}
               </el-button>
             </el-upload>
             <el-button v-if="currentTeacher.profileFile" type="primary" link @click="downloadFile(currentTeacher.profileFile)" class="flex items-center">
               <el-icon class="mr-1"><Download /></el-icon>
-              Xem file
+              {{ $t('teacher.btn_view') }}
             </el-button>
           </div>
         </el-form-item>
 
-        <el-form-item label="File chứng chỉ đính kèm (Certificate File)" class="col-span-2">
+        <el-form-item :label="$t('teacher.certificate_file')" class="col-span-2">
           <div class="flex items-center gap-3 w-full">
-            <el-input v-model="currentTeacher.certificateFile" placeholder="Chọn file pdf/doc/image..." disabled class="flex-grow" />
+            <el-input v-model="currentTeacher.certificateFile" :placeholder="$t('teacher.placeholder_file')" disabled class="flex-grow" />
             <el-upload
               action=""
               :http-request="(options: any) => handleFileUpload(options, 'certificateFile')"
@@ -291,12 +291,12 @@
             >
               <el-button type="success" plain :loading="uploadingCertificate" class="flex items-center">
                 <el-icon class="mr-1"><Upload /></el-icon>
-                Tải file lên
+                {{ $t('teacher.btn_upload') }}
               </el-button>
             </el-upload>
             <el-button v-if="currentTeacher.certificateFile" type="primary" link @click="downloadFile(currentTeacher.certificateFile)" class="flex items-center">
               <el-icon class="mr-1"><Download /></el-icon>
-              Xem file
+              {{ $t('teacher.btn_view') }}
             </el-button>
           </div>
         </el-form-item>
@@ -312,7 +312,7 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button @click="closeModal">Hủy bỏ</el-button>
+            <el-button @click="closeModal">{{ $t('common.cancel') }}</el-button>
             <el-button type="primary" @click="saveTeacher" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
               {{ $t('common.save') }}
             </el-button>
@@ -410,12 +410,12 @@ const handleFileUpload = async (options: any, fieldName: 'profileFile' | 'certif
 
     if (res.success) {
       currentTeacher.value[fieldName] = res.data;
-      ElMessage.success('Tải tập tin lên thành công');
+      ElMessage.success(t('teacher.success_upload'));
     } else {
-      ElMessage.error(res.message || 'Tải tập tin thất bại');
+      ElMessage.error(res.message || t('teacher.error_upload'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi tải file lên');
+    ElMessage.error(err.response?.data?.message || t('teacher.error_upload_system'));
   } finally {
     if (fieldName === 'profileFile') {
       uploadingProfile.value = false;
@@ -449,7 +449,7 @@ const fetchTeachers = async () => {
       totalElements.value = res.data.totalElements;
     }
   } catch (err) {
-    ElMessage.error(t('teacher.error_load') || 'Lỗi khi tải dữ liệu giáo viên');
+    ElMessage.error(t('teacher.error_load'));
   }
 };
 
@@ -507,15 +507,15 @@ const closeModal = () => {
 const saveTeacher = async () => {
   // Input validations
   if (!currentTeacher.value.fullName) {
-    ElMessage.warning('Họ và tên không được để trống');
+    ElMessage.warning(t('teacher.warn_name_empty'));
     return;
   }
   if (!currentTeacher.value.email) {
-    ElMessage.warning('Email không được để trống');
+    ElMessage.warning(t('teacher.warn_email_empty'));
     return;
   }
   if (!currentTeacher.value.phone) {
-    ElMessage.warning('Số điện thoại không được để trống');
+    ElMessage.warning(t('teacher.warn_phone_empty'));
     return;
   }
 
@@ -531,37 +531,37 @@ const saveTeacher = async () => {
     }
 
     if (res.success) {
-      ElMessage.success(t('common.success') || 'Lưu thành công');
+      ElMessage.success(t('teacher.success_save'));
       closeModal();
       fetchTeachers();
     } else {
-      ElMessage.error(res.message || 'Lưu thất bại');
+      ElMessage.error(res.message || t('teacher.success_save_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || err.message || 'Lỗi máy chủ');
+    ElMessage.error(err.response?.data?.message || err.message || t('teacher.error_server'));
   }
 };
 
 const deleteTeacher = async (id: number) => {
   try {
     await ElMessageBox.confirm(
-      t('teacher.delete_confirm') || 'Bạn có chắc chắn muốn xóa giáo viên này không?',
-      t('common.confirm') || 'Xác nhận xóa',
+      t('teacher.confirm_delete_text'),
+      t('teacher.confirm_delete_title'),
       {
-        confirmButtonText: t('common.delete') || 'Xóa',
-        cancelButtonText: t('common.cancel') || 'Hủy',
+        confirmButtonText: t('common.delete'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning',
       }
     );
     
     const res: any = await api.delete(`/teachers/${id}`);
     if (res.success) {
-      ElMessage.success(t('common.success') || 'Xóa thành công');
+      ElMessage.success(t('teacher.success_delete'));
       fetchTeachers();
     }
   } catch (err: any) {
     if (err !== 'cancel') {
-      ElMessage.error(err.response?.data?.message || 'Không thể xóa giáo viên này vì có ràng buộc');
+      ElMessage.error(err.response?.data?.message || t('teacher.error_delete_referenced'));
     }
   }
 };
@@ -610,9 +610,9 @@ const getStatusType = (status: string) => {
 };
 
 const getStatusLabel = (status: string) => {
-  if (status === 'ACTIVE') return 'Đang hoạt động';
-  if (status === 'ON_LEAVE') return 'Nghỉ phép';
-  return 'Tạm khóa';
+  if (status === 'ACTIVE') return t('teacher.status_active');
+  if (status === 'ON_LEAVE') return t('teacher.status_on_leave');
+  return t('teacher.status_inactive');
 };
 
 

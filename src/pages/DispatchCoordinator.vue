@@ -5,9 +5,9 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-          Điều phối Lịch giảng dạy
+          {{ $t('dispatch.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1">Điều chỉnh lịch dạy, đổi phòng, đổi giáo viên đứng lớp hoặc hoãn buổi học theo ngày dương lịch cụ thể.</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('dispatch.desc') }}</p>
       </div>
     </div>
 
@@ -16,7 +16,7 @@
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
           <el-icon class="text-emerald-500"><Search /></el-icon>
-          Bộ lọc nâng cao
+          {{ $t('common.filter_advanced') }}
         </h2>
         <div class="flex items-center gap-2">
           <el-button 
@@ -26,25 +26,25 @@
             class="!bg-amber-600 hover:!bg-amber-700 !border-amber-600 shadow-md transition-all duration-300 mr-2"
           >
             <el-icon class="mr-1"><Edit /></el-icon>
-            Điều phối hàng loạt ({{ selectedLessons.length }})
+            {{ $t('dispatch.bulk_btn', { count: selectedLessons.length }) }}
           </el-button>
           <el-button type="primary" @click="fetchDailyDispatch" class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600">
             <el-icon class="mr-1"><Search /></el-icon>
-            Tìm kiếm
+            {{ $t('common.search_btn') }}
           </el-button>
           <el-button @click="resetSearch" class="hover:text-emerald-600 hover:border-emerald-200">
             <el-icon class="mr-1"><Refresh /></el-icon>
-            Đặt lại
+            {{ $t('common.reset_btn') }}
           </el-button>
         </div>
       </div>
 
       <el-form :model="searchForm" label-position="top" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Kế hoạch khai giảng -->
-        <el-form-item label="Kế hoạch khai giảng" class="!mb-0 font-semibold text-gray-700">
+        <el-form-item :label="$t('timetable.filter_batch')" class="!mb-0 font-semibold text-gray-700">
           <el-select 
             v-model="searchForm.batchId" 
-            placeholder="Tất cả kế hoạch..." 
+            :placeholder="$t('timetable.filter_batch_placeholder')" 
             filterable 
             clearable 
             @change="onBatchChange"
@@ -60,10 +60,10 @@
         </el-form-item>
 
         <!-- Lớp học -->
-        <el-form-item label="Lớp học" class="!mb-0 font-semibold text-gray-700">
+        <el-form-item :label="$t('class.title')" class="!mb-0 font-semibold text-gray-700">
           <el-select 
             v-model="searchForm.classId" 
-            placeholder="Chọn lớp học..." 
+            :placeholder="$t('dispatch.search_placeholder')" 
             filterable 
             clearable 
             class="w-full premium-select"
@@ -78,10 +78,10 @@
         </el-form-item>
 
         <!-- Giáo viên -->
-        <el-form-item label="Giáo viên" class="!mb-0 font-semibold text-gray-700">
+        <el-form-item :label="$t('teacher.title')" class="!mb-0 font-semibold text-gray-700">
           <el-select 
             v-model="searchForm.teacherId" 
-            placeholder="Tất cả giáo viên..." 
+            :placeholder="$t('timetable.all_teachers')" 
             filterable 
             clearable 
             class="w-full premium-select"
@@ -96,13 +96,13 @@
         </el-form-item>
 
         <!-- Ngày học (từ ngày - đến ngày) -->
-        <el-form-item label="Ngày học" class="!mb-0 font-semibold text-gray-700">
+        <el-form-item :label="$t('dispatch.filter_date')" class="!mb-0 font-semibold text-gray-700">
           <el-date-picker
             v-model="searchForm.dateRange"
             type="daterange"
-            range-separator="đến"
-            start-placeholder="Từ ngày"
-            end-placeholder="Đến ngày"
+            :range-separator="$t('dispatch.filter_date_to')"
+            :start-placeholder="$t('dispatch.filter_date_start')"
+            :end-placeholder="$t('dispatch.filter_date_end')"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
             :clearable="false"
@@ -125,7 +125,7 @@
         <el-table-column type="selection" width="55" align="center" />
 
         <!-- Ngày học -->
-        <el-table-column label="Ngày học" min-width="125">
+        <el-table-column :label="$t('dispatch.col_date')" min-width="125">
           <template #default="{ row }">
             <div class="font-bold text-gray-900">{{ formatDateLabel(row.sessionDate) }}</div>
             <div class="text-xs text-gray-400 mt-0.5">{{ row.dayOfWeek }}</div>
@@ -133,7 +133,7 @@
         </el-table-column>
 
         <!-- Chỉ số buổi -->
-        <el-table-column label="Buổi số" width="90" align="center">
+        <el-table-column :label="$t('dispatch.col_lesson')" width="90" align="center">
           <template #default="{ row }">
             <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">
               #{{ row.lessonIndex }}
@@ -142,15 +142,15 @@
         </el-table-column>
 
         <!-- Tên lớp học -->
-        <el-table-column label="Lớp học" min-width="180">
+        <el-table-column :label="$t('dispatch.col_class')" min-width="180">
           <template #default="{ row }">
             <div class="font-extrabold text-gray-900 hover:text-emerald-600 transition-colors duration-200">{{ row.className }}</div>
-            <div class="text-xs text-gray-400 mt-0.5">Yêu cầu trình độ: {{ row.requiredSkill }}</div>
+            <div class="text-xs text-gray-400 mt-0.5">{{ $t('dispatch.col_required_skill', { skill: row.requiredSkill }) }}</div>
           </template>
         </el-table-column>
 
         <!-- Ca học & Giờ học -->
-        <el-table-column label="Ca học (Thời gian)" min-width="200">
+        <el-table-column :label="$t('dispatch.col_timeslot')" min-width="200">
           <template #default="{ row }">
             <div class="flex items-center gap-2">
               <el-tag type="info" size="small" class="font-bold rounded bg-gray-50 text-gray-600 border border-gray-200">
@@ -164,32 +164,32 @@
         </el-table-column>
 
         <!-- Giáo viên phụ trách -->
-        <el-table-column label="Giáo viên đứng lớp" min-width="180">
+        <el-table-column :label="$t('dispatch.col_teacher')" min-width="180">
           <template #default="{ row }">
             <div v-if="row.teacherName" class="flex items-center gap-2">
               <span class="font-bold text-gray-800">{{ row.teacherName }}</span>
             </div>
             <span v-else class="text-red-500 text-xs italic flex items-center gap-1">
-              <el-icon><Warning /></el-icon> Chưa có giáo viên
+              <el-icon><Warning /></el-icon> {{ $t('dispatch.col_no_teacher') }}
             </span>
           </template>
         </el-table-column>
 
         <!-- Phòng học -->
-        <el-table-column label="Phòng học" min-width="120">
+        <el-table-column :label="$t('dispatch.col_room')" min-width="120">
           <template #default="{ row }">
             <div v-if="row.roomName" class="font-semibold text-gray-700 flex items-center gap-1">
               <el-icon class="text-teal-600"><OfficeBuilding /></el-icon>
               {{ row.roomName }}
             </div>
-            <span v-else class="text-red-500 text-xs italic">Chưa xếp phòng</span>
+            <span v-else class="text-red-500 text-xs italic">{{ $t('dispatch.col_no_room') }}</span>
           </template>
         </el-table-column>
 
         <!-- Khóa/Mở khóa lịch -->
-        <el-table-column label="Khóa lịch" width="100" align="center">
+        <el-table-column :label="$t('dispatch.col_lock')" width="100" align="center">
           <template #default="{ row }">
-            <el-tooltip :content="row.pinned ? 'Lịch đã bị khóa/ghim cố định' : 'Lịch tự do (có thể tối ưu lại khi chạy Solver)'" placement="top">
+            <el-tooltip :content="row.pinned ? $t('dispatch.tooltip_locked') : $t('dispatch.tooltip_free')" placement="top">
               <span class="inline-flex items-center justify-center p-1.5 rounded-lg transition-colors" :class="row.pinned ? 'bg-amber-50 text-amber-600' : 'bg-gray-50 text-gray-400'">
                 <el-icon :size="16">
                   <Lock v-if="row.pinned" />
@@ -201,7 +201,7 @@
         </el-table-column>
 
         <!-- Hành động điều phối -->
-        <el-table-column label="Điều phối" width="150" align="center" fixed="right">
+        <el-table-column :label="$t('dispatch.col_action')" width="150" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -210,20 +210,20 @@
               class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-sm transition-all duration-200"
             >
               <el-icon class="mr-1"><Edit /></el-icon>
-              Điều phối
+              {{ $t('dispatch.btn_dispatch') }}
             </el-button>
           </template>
         </el-table-column>
 
         <!-- Empty state -->
         <template #empty>
-          <el-empty :description="`Không tìm thấy buổi học nào phù hợp với bộ lọc trong khoảng thời gian ${formatDateRangeLabel(searchForm.dateRange)}`" />
+          <el-empty :description="$t('dispatch.empty_filters', { range: formatDateRangeLabel(searchForm.dateRange) })" />
         </template>
       </el-table>
 
       <!-- Pagination Footer -->
       <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50">
-        <div class="text-xs text-gray-500">Hiển thị {{ paginatedEntries.length }} / tổng số {{ dispatchEntries.length }} buổi học.</div>
+        <div class="text-xs text-gray-500">{{ $t('dispatch.total_count', { show: paginatedEntries.length, total: dispatchEntries.length }) }}</div>
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
@@ -238,7 +238,7 @@
     <!-- Adjustment Premium Dialog -->
     <el-dialog
       v-model="showAdjustDialog"
-      title="Điều phối lịch buổi học chi tiết"
+      :title="$t('dispatch.dialog_title')"
       width="450px"
       destroy-on-close
       custom-class="premium-dialog"
@@ -246,18 +246,18 @@
       <div v-if="selectedEntry" class="space-y-4">
         <!-- Thông tin buổi học hiện tại -->
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 text-xs space-y-1.5">
-          <div><span class="font-bold text-gray-500">Lớp học:</span> <span class="font-extrabold text-gray-800">{{ selectedEntry.className }}</span></div>
-          <div><span class="font-bold text-gray-500">Buổi số:</span> <span class="font-bold text-emerald-700">Buổi #{{ selectedEntry.lessonIndex }}</span></div>
-          <div><span class="font-bold text-gray-500">Giờ học cũ:</span> <span class="font-semibold text-gray-700">{{ selectedEntry.timeslotLabel }} ({{ selectedEntry.startTime }} - {{ selectedEntry.endTime }})</span></div>
+          <div><span class="font-bold text-gray-500">{{ $t('dispatch.dialog_class') }}</span> <span class="font-extrabold text-gray-800">{{ selectedEntry.className }}</span></div>
+          <div><span class="font-bold text-gray-500">{{ $t('dispatch.dialog_lesson') }}</span> <span class="font-bold text-emerald-700">{{ $t('dispatch.dialog_lesson_val', { index: selectedEntry.lessonIndex }) }}</span></div>
+          <div><span class="font-bold text-gray-500">{{ $t('dispatch.dialog_old_time') }}</span> <span class="font-semibold text-gray-700">{{ selectedEntry.timeslotLabel }} ({{ selectedEntry.startTime }} - {{ selectedEntry.endTime }})</span></div>
         </div>
 
         <el-form :model="adjustmentForm" label-position="top" v-loading="checkingValidation">
           <!-- 1. Hoãn / Thay đổi ngày học cụ thể -->
-          <el-form-item label="Ngày học dương lịch cụ thể (Dịch ngày / Hoãn)">
+          <el-form-item :label="$t('dispatch.dialog_date_label')">
             <el-date-picker
               v-model="adjustmentForm.sessionDate"
               type="date"
-              placeholder="Chọn ngày học mới..."
+              :placeholder="$t('dispatch.dialog_date_placeholder')"
               format="DD/MM/YYYY"
               value-format="YYYY-MM-DD"
               class="!w-full"
@@ -265,27 +265,27 @@
           </el-form-item>
 
           <!-- 2. Thay đổi ca học cố định trong tuần -->
-          <el-form-item label="Ca học (Timeslot)">
-            <el-select v-model="adjustmentForm.timeslotId" placeholder="Chọn ca học cố định..." filterable clearable class="w-full">
+          <el-form-item :label="$t('dispatch.dialog_timeslot_label')">
+            <el-select v-model="adjustmentForm.timeslotId" :placeholder="$t('dispatch.dialog_timeslot_placeholder')" filterable clearable class="w-full">
               <el-option
                 v-for="ts in optimizedTimeslots"
                 :key="ts.id"
                 :value="ts.id"
-                :label="ts.label + ' (' + (ts.startTime ? ts.startTime.substring(0, 5) : '') + ' - ' + (ts.endTime ? ts.endTime.substring(0, 5) : '') + ')' + (ts.id === selectedEntry?.timeslotId ? ' (Hiện tại)' : (ts.isOccupied ? ' (Bận phòng/GV)' : ' (Trống)'))"
+                :label="getTimeslotOptionLabel(ts, false)"
                 :class="ts.isOccupied ? '!text-gray-400 italic' : '!text-emerald-700 !font-semibold'"
               />
             </el-select>
           </el-form-item>
 
           <!-- 3. Thay đổi phòng học -->
-          <el-form-item label="Phòng học">
+          <el-form-item :label="$t('dispatch.dialog_room_label')">
             <div class="flex flex-col gap-1.5 w-full">
-              <el-select v-model="adjustmentForm.roomId" placeholder="Chọn phòng học mới..." filterable clearable class="w-full">
+              <el-select v-model="adjustmentForm.roomId" :placeholder="$t('dispatch.dialog_room_placeholder')" filterable clearable class="w-full">
                 <el-option
                   v-for="rm in optimizedRooms"
                   :key="rm.id"
                   :value="rm.id"
-                  :label="rm.name + (rm.id === selectedEntry?.roomId ? ' (Hiện tại)' : (rm.isOccupied ? ' (Đã bị chiếm ca này)' : ' (Trống)'))"
+                  :label="getRoomOptionLabel(rm, false)"
                   :class="rm.isOccupied ? '!text-gray-400 italic' : '!text-emerald-700 !font-semibold'"
                 />
               </el-select>
@@ -302,11 +302,11 @@
           </el-form-item>
 
           <!-- 4. Thay đổi giáo viên đứng lớp -->
-          <el-form-item label="Giáo viên đứng lớp (Thay thế)">
+          <el-form-item :label="$t('dispatch.dialog_teacher_label')">
             <div class="flex flex-col gap-1.5 w-full">
               <el-select
                 v-model="adjustmentForm.teacherId"
-                placeholder="Chọn giáo viên dạy thay..."
+                :placeholder="$t('dispatch.dialog_teacher_placeholder')"
                 filterable
                 clearable
                 class="w-full"
@@ -316,7 +316,7 @@
                   v-for="tc in (showAllTeachersToggle ? teachers : suggestedTeachers)"
                   :key="tc.id"
                   :value="tc.id"
-                  :label="tc.fullName + (tc.id === selectedEntry?.teacherId ? ' (Hiện tại)' : '')"
+                  :label="tc.fullName + (tc.id === selectedEntry?.teacherId ? ' (' + $t('timetable.week_current') + ')' : '')"
                 />
               </el-select>
               
@@ -324,19 +324,19 @@
               <div class="flex items-center justify-between text-xs mt-1 select-none">
                 <span v-if="!showAllTeachersToggle" class="text-emerald-600 font-semibold flex items-center gap-1">
                   <el-icon><Check /></el-icon>
-                  Đang lọc giáo viên tối ưu (đủ trình độ & trống lịch)
+                  {{ $t('dispatch.dialog_teacher_filtering') }}
                 </span>
                 <span v-else class="text-amber-600 font-semibold flex items-center gap-1">
                   <el-icon><Warning /></el-icon>
-                  Đang hiển thị toàn bộ giáo viên
+                  {{ $t('dispatch.dialog_teacher_showing_all') }}
                 </span>
-                <el-checkbox v-model="showAllTeachersToggle" size="small">Hiển thị tất cả</el-checkbox>
+                <el-checkbox v-model="showAllTeachersToggle" size="small">{{ $t('dispatch.dialog_teacher_show_all_cb') }}</el-checkbox>
               </div>
 
               <!-- Cảnh báo khi không tìm thấy giáo viên tối ưu -->
               <el-alert
                 v-if="hasNoAlternativeSuggestions && !showAllTeachersToggle"
-                title="Không tìm thấy giáo viên tối ưu nào trống lịch và có chuyên môn phù hợp trong ca này. Hãy chọn 'Hiển thị tất cả' để điều phối thủ công."
+                :title="$t('dispatch.dialog_teacher_no_optimal')"
                 type="warning"
                 :closable="false"
                 show-icon
@@ -375,7 +375,7 @@
 
       <template #footer>
         <div class="flex justify-end gap-2 p-2 border-t border-gray-100">
-          <el-button @click="showAdjustDialog = false">Hủy bỏ</el-button>
+          <el-button @click="showAdjustDialog = false">{{ $t('common.cancel') }}</el-button>
           <el-button
             type="primary"
             :loading="saving"
@@ -383,7 +383,7 @@
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-sm"
           >
             <el-icon class="mr-1"><Check /></el-icon>
-            Lưu điều phối (Khóa lịch)
+            {{ $t('dispatch.btn_dispatch') }}
           </el-button>
         </div>
       </template>
@@ -392,7 +392,7 @@
     <!-- Dialog Điều phối Hàng loạt (Batch Adjustment Premium Dialog) -->
     <el-dialog
       v-model="showBatchAdjustDialog"
-      title="Điều phối lịch giảng dạy hàng loạt"
+      :title="$t('dispatch.dialog_bulk_title')"
       width="500px"
       destroy-on-close
       custom-class="premium-dialog"
@@ -401,8 +401,8 @@
         <!-- Tóm tắt các buổi học đã chọn -->
         <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-2">
           <div class="text-xs font-bold text-gray-500 flex justify-between items-center">
-            <span>DANH SÁCH BUỔI HỌC ĐÃ CHỌN ({{ selectedLessons.length }} BUỔI)</span>
-            <span class="text-emerald-600 font-extrabold">Đang chọn</span>
+            <span>{{ $t('dispatch.dialog_bulk_selected_title', { count: selectedLessons.length }) }}</span>
+            <span class="text-emerald-600 font-extrabold">{{ $t('dispatch.dialog_bulk_selected_tag') }}</span>
           </div>
           <div class="max-h-24 overflow-y-auto border border-gray-100 rounded bg-white p-2 text-xs space-y-1.5 scrollbar-thin">
             <div 
@@ -410,22 +410,22 @@
               :key="lesson.lessonId" 
               class="flex justify-between items-center text-gray-700 font-bold"
             >
-              <span>{{ lesson.className }} - Buổi #{{ lesson.lessonIndex }}</span>
+              <span>{{ $t('dispatch.dialog_bulk_selected_item', { className: lesson.className, index: lesson.lessonIndex }) }}</span>
               <span class="text-gray-400 text-[10px]">Ca: {{ lesson.timeslotLabel ? lesson.timeslotLabel.split(' - ')[1] || lesson.timeslotLabel : '—' }} ({{ formatDateLabel(lesson.sessionDate) }})</span>
             </div>
           </div>
           <div class="text-[10px] text-amber-600 font-semibold italic mt-1">
-            (*) Lưu ý: Các trường bên dưới nếu để trống (không chọn) thì hệ thống sẽ giữ nguyên giá trị gốc của từng buổi học tương ứng.
+            {{ $t('dispatch.dialog_bulk_note') }}
           </div>
         </div>
 
         <el-form :model="batchAdjustmentForm" label-position="top" v-loading="checkingBatchValidation">
           <!-- 1. Ngày học dương lịch cụ thể (Dịch ngày hàng loạt) -->
-          <el-form-item label="Ngày học dương lịch mới">
+          <el-form-item :label="$t('dispatch.dialog_bulk_date_label')">
             <el-date-picker
               v-model="batchAdjustmentForm.sessionDate"
               type="date"
-              :placeholder="isSameClass ? 'Không thể đổi ngày cho cùng 1 lớp' : 'Giữ nguyên ngày cũ...'"
+              :placeholder="isSameClass ? $t('dispatch.dialog_bulk_date_placeholder_same') : $t('dispatch.dialog_bulk_date_placeholder_diff')"
               format="DD/MM/YYYY"
               value-format="YYYY-MM-DD"
               class="!w-full"
@@ -435,10 +435,10 @@
           </el-form-item>
 
           <!-- 2. Thay đổi ca học hàng loạt -->
-          <el-form-item label="Ca học mới (Timeslot)">
+          <el-form-item :label="$t('dispatch.dialog_bulk_timeslot_label')">
             <el-select
               v-model="batchAdjustmentForm.timeslotId"
-              :placeholder="isTimeslotDisabled ? (isSameClass ? 'Không thể đổi ca' : 'Chỉ đổi ca khi chọn ngày mới') : 'Giữ nguyên ca cũ...'"
+              :placeholder="isTimeslotDisabled ? (isSameClass ? $t('dispatch.dialog_bulk_timeslot_placeholder_disabled_same') : $t('dispatch.dialog_bulk_timeslot_placeholder_disabled_diff')) : $t('dispatch.dialog_bulk_timeslot_placeholder_enabled')"
               filterable
               clearable
               :disabled="isTimeslotDisabled"
@@ -448,21 +448,21 @@
                 v-for="ts in optimizedBatchTimeslots"
                 :key="ts.id"
                 :value="ts.id"
-                :label="ts.label + ' (' + (ts.startTime ? ts.startTime.substring(0, 5) : '') + ' - ' + (ts.endTime ? ts.endTime.substring(0, 5) : '') + ')' + (ts.isOccupied ? ' (Bận phòng/GV)' : ' (Trống)')"
+                :label="getTimeslotOptionLabel(ts, true)"
                 :class="ts.isOccupied ? '!text-gray-400 italic' : '!text-emerald-700 !font-semibold'"
               />
             </el-select>
           </el-form-item>
 
           <!-- 3. Thay đổi phòng học hàng loạt -->
-          <el-form-item label="Phòng học mới">
+          <el-form-item :label="$t('dispatch.dialog_bulk_room_label')">
             <div class="flex flex-col gap-1.5 w-full">
-              <el-select v-model="batchAdjustmentForm.roomId" placeholder="Giữ nguyên phòng cũ..." filterable clearable class="w-full">
+              <el-select v-model="batchAdjustmentForm.roomId" :placeholder="$t('dispatch.dialog_bulk_room_placeholder')" filterable clearable class="w-full">
                 <el-option
                   v-for="rm in optimizedBatchRooms"
                   :key="rm.id"
                   :value="rm.id"
-                  :label="rm.name + (rm.isOccupied ? ' (Đã bị chiếm ca này)' : ' (Trống)')"
+                  :label="getRoomOptionLabel(rm, true)"
                   :class="rm.isOccupied ? '!text-gray-400 italic' : '!text-emerald-700 !font-semibold'"
                 />
               </el-select>
@@ -487,11 +487,11 @@
           </el-form-item>
 
           <!-- 4. Thay đổi giáo viên đứng lớp hàng loạt -->
-          <el-form-item label="Giáo viên mới">
+          <el-form-item :label="$t('dispatch.dialog_bulk_teacher_label')">
             <div class="flex flex-col gap-1.5 w-full">
               <el-select
                 v-model="batchAdjustmentForm.teacherId"
-                placeholder="Giữ nguyên giáo viên cũ..."
+                :placeholder="$t('dispatch.dialog_bulk_teacher_placeholder')"
                 filterable
                 clearable
                 class="w-full"
@@ -509,19 +509,19 @@
               <div class="flex items-center justify-between text-xs mt-1 select-none">
                 <span v-if="!showAllTeachersBatchToggle" class="text-emerald-600 font-semibold flex items-center gap-1">
                   <el-icon><Check /></el-icon>
-                  Đang lọc giáo viên tối ưu cho tất cả buổi học
+                  {{ $t('dispatch.dialog_bulk_teacher_filtering') }}
                 </span>
                 <span v-else class="text-amber-600 font-semibold flex items-center gap-1">
                   <el-icon><Warning /></el-icon>
-                  Đang hiển thị toàn bộ giáo viên
+                  {{ $t('dispatch.dialog_bulk_teacher_showing_all') }}
                 </span>
-                <el-checkbox v-model="showAllTeachersBatchToggle" size="small">Hiển thị tất cả</el-checkbox>
+                <el-checkbox v-model="showAllTeachersBatchToggle" size="small">{{ $t('dispatch.dialog_teacher_show_all_cb') }}</el-checkbox>
               </div>
 
               <!-- Cảnh báo khi không tìm thấy giáo viên tối ưu -->
               <el-alert
                 v-if="hasNoBatchAlternativeSuggestions && !showAllTeachersBatchToggle && batchAdjustmentForm.timeslotId"
-                title="Không tìm thấy giáo viên tối ưu nào trống lịch và có chuyên môn giảng dạy tất cả lớp được chọn. Hãy chọn 'Hiển thị tất cả' để điều phối thủ công."
+                :title="$t('dispatch.dialog_bulk_teacher_no_optimal')"
                 type="warning"
                 :closable="false"
                 show-icon
@@ -568,7 +568,7 @@
 
       <template #footer>
         <div class="flex justify-end gap-2 p-2 border-t border-gray-100">
-          <el-button @click="showBatchAdjustDialog = false">Hủy bỏ</el-button>
+          <el-button @click="showBatchAdjustDialog = false">{{ $t('common.cancel') }}</el-button>
           <el-button
             type="primary"
             :loading="saving"
@@ -576,7 +576,7 @@
             class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-sm"
           >
             <el-icon class="mr-1"><Check /></el-icon>
-            Lưu điều phối hàng loạt (Khóa lịch)
+            {{ $t('dispatch.bulk_save_btn') }}
           </el-button>
         </div>
       </template>
@@ -587,11 +587,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import api from '@/api/axios';
 import { Edit, Lock, Unlock, OfficeBuilding, Warning, Check, Search, Refresh } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { format } from 'date-fns';
 
+const { t } = useI18n();
 const route = useRoute();
 const loading = ref(false);
 const saving = ref(false);
@@ -867,6 +869,39 @@ const getDayOfWeekString = (dateStr: string): string => {
   const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
   const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
   return days[date.getDay()];
+};
+
+const getTimeslotOptionLabel = (ts: any, isBatch: boolean) => {
+  if (!ts) return '';
+  const start = ts.startTime ? ts.startTime.substring(0, 5) : '';
+  const end = ts.endTime ? ts.endTime.substring(0, 5) : '';
+  const timeStr = `(${start} - ${end})`;
+  let marker = '';
+  if (isBatch) {
+    marker = ts.isOccupied ? ` (${t('dispatch.dialog_occupied')})` : ` (${t('dispatch.dialog_empty')})`;
+  } else {
+    if (ts.id === selectedEntry.value?.timeslotId) {
+      marker = ` (${t('timetable.week_current')})`;
+    } else {
+      marker = ts.isOccupied ? ` (${t('dispatch.dialog_occupied')})` : ` (${t('dispatch.dialog_empty')})`;
+    }
+  }
+  return `${ts.label} ${timeStr}${marker}`;
+};
+
+const getRoomOptionLabel = (rm: any, isBatch: boolean) => {
+  if (!rm) return '';
+  let marker = '';
+  if (isBatch) {
+    marker = rm.isOccupied ? ` (${t('dispatch.dialog_occupied')})` : ` (${t('dispatch.dialog_empty')})`;
+  } else {
+    if (rm.id === selectedEntry.value?.roomId) {
+      marker = ` (${t('timetable.week_current')})`;
+    } else {
+      marker = rm.isOccupied ? ` (${t('dispatch.dialog_occupied')})` : ` (${t('dispatch.dialog_empty')})`;
+    }
+  }
+  return `${rm.name}${marker}`;
 };
 
 // Danh sách ca học sau khi đã phân tích tối ưu (Ca học trống phòng và giáo viên lên đầu)
@@ -1156,20 +1191,20 @@ watch(
             const hasTeacherConflict = !!(res.data.teacherConflict || res.data.batchTeacherConflict || res.data.teacherLeave || res.data.teacherUnavailable);
 
             if (hasRoomConflict || hasTeacherConflict) {
-              let msg = 'Hành động thay đổi ca học sẽ gây ';
+              let msg = t('dispatch.timeslot_change_warn_start');
               if (hasRoomConflict && hasTeacherConflict) {
-                msg += 'xung đột phòng học và giáo viên. Bạn sẽ phải lựa chọn phòng học và giáo viên mới.';
+                msg += t('dispatch.timeslot_change_warn_both');
               } else if (hasRoomConflict) {
-                msg += 'xung đột phòng học. Bạn sẽ phải lựa chọn phòng học mới.';
+                msg += t('dispatch.timeslot_change_warn_room');
               } else {
-                msg += 'xung đột giáo viên. Bạn sẽ phải lựa chọn giáo viên mới.';
+                msg += t('dispatch.timeslot_change_warn_teacher');
               }
-              msg += ' Bạn có đồng ý thay đổi ca học không?';
+              msg += t('dispatch.timeslot_change_warn_end');
 
               try {
-                await ElMessageBox.confirm(msg, 'Cảnh báo trùng lịch ca học', {
-                  confirmButtonText: 'Đồng ý thay đổi',
-                  cancelButtonText: 'Hủy bỏ',
+                await ElMessageBox.confirm(msg, t('dispatch.timeslot_change_warn_title'), {
+                  confirmButtonText: t('dispatch.timeslot_change_warn_confirm'),
+                  cancelButtonText: t('dispatch.timeslot_change_warn_cancel'),
                   type: 'warning',
                   customClass: 'premium-message-box'
                 });
@@ -1254,7 +1289,7 @@ const submitBatchAdjustment = async () => {
 
   const { teacherId, roomId, timeslotId, sessionDate } = batchAdjustmentForm.value;
   if (!teacherId && !roomId && !timeslotId && !sessionDate) {
-    ElMessage.warning('Vui lòng chọn ít nhất một thông tin để thực hiện điều phối hàng loạt.');
+    ElMessage.warning(t('dispatch.bulk_select_required'));
     return;
   }
 
@@ -1262,11 +1297,11 @@ const submitBatchAdjustment = async () => {
   if (hasConflicts) {
     try {
       await ElMessageBox.confirm(
-        'Hệ thống phát hiện có xung đột trùng lịch hoặc chuyên môn (Hard Constraint) trong danh sách hàng loạt. Bạn có chắc chắn muốn bỏ qua các cảnh báo này và tiếp tục lưu điều phối không?',
-        'Cảnh báo trùng lịch học hàng loạt',
+        t('dispatch.bulk_conflict_warn_text'),
+        t('dispatch.bulk_conflict_warn_title'),
         {
-          confirmButtonText: 'Bỏ qua & Tiếp tục lưu',
-          cancelButtonText: 'Hủy bỏ',
+          confirmButtonText: t('dispatch.bulk_conflict_warn_confirm'),
+          cancelButtonText: t('dispatch.bulk_conflict_warn_cancel'),
           type: 'warning',
           customClass: 'premium-message-box'
         }
@@ -1286,15 +1321,15 @@ const submitBatchAdjustment = async () => {
       sessionDate: sessionDate || null
     });
     if (res.success) {
-      ElMessage.success(res.message || 'Điều phối lịch dạy hàng loạt thành công!');
+      ElMessage.success(res.message || t('dispatch.bulk_success'));
       showBatchAdjustDialog.value = false;
       selectedLessons.value = [];
       fetchDailyDispatch();
     } else {
-      ElMessage.error(res.message || 'Điều phối hàng loạt thất bại');
+      ElMessage.error(res.message || t('dispatch.bulk_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi điều phối hàng loạt lịch học');
+    ElMessage.error(err.response?.data?.message || t('dispatch.conflict_check_failed'));
   } finally {
     saving.value = false;
   }
@@ -1340,11 +1375,11 @@ const submitAdjustment = async () => {
   if (hasConflicts) {
     try {
       await ElMessageBox.confirm(
-        'Hệ thống phát hiện có xung đột trùng lịch (Hard Constraint). Bạn có chắc chắn muốn bỏ qua các cảnh báo này và tiếp tục lưu điều phối không?',
-        'Cảnh báo trùng lịch học',
+        t('dispatch.single_conflict_warn_text'),
+        t('dispatch.single_conflict_warn_title'),
         {
-          confirmButtonText: 'Bỏ qua & Tiếp tục lưu',
-          cancelButtonText: 'Hủy bỏ',
+          confirmButtonText: t('dispatch.single_conflict_warn_confirm'),
+          cancelButtonText: t('dispatch.single_conflict_warn_cancel'),
           type: 'warning',
           customClass: 'premium-message-box'
         }
@@ -1359,14 +1394,14 @@ const submitAdjustment = async () => {
   try {
     const res: any = await api.put(`/class-planning/dispatch/${selectedEntry.value.lessonId}`, adjustmentForm.value);
     if (res.success) {
-      ElMessage.success('Điều phối ca học và khóa lịch cố định thành công!');
+      ElMessage.success(t('dispatch.single_success'));
       showAdjustDialog.value = false;
       fetchDailyDispatch();
     } else {
-      ElMessage.error(res.message || 'Điều phối thất bại');
+      ElMessage.error(res.message || t('dispatch.single_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi điều phối ca học');
+    ElMessage.error(err.response?.data?.message || t('dispatch.conflict_check_single_failed'));
   } finally {
     saving.value = false;
   }

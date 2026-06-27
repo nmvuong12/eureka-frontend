@@ -5,10 +5,10 @@
       <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
           <span class="bg-gradient-to-r from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
-          Cấu hình Thuật toán Xếp lịch
+          {{ $t('algorithm.title') }}
         </h1>
         <p class="text-sm text-gray-500 mt-1">
-          Tinh chỉnh trạng thái hoạt động và trọng số ưu tiên của các ràng buộc mềm giúp hệ thống tối ưu hóa thời khóa biểu phù hợp nhất với thực tế.
+          {{ $t('algorithm.desc') }}
         </p>
       </div>
       
@@ -21,7 +21,7 @@
           class="hover:!bg-gray-50"
         >
           <el-icon class="mr-1"><Refresh /></el-icon>
-          Tải lại
+          {{ $t('algorithm.reload') }}
         </el-button>
         <el-button 
           type="primary" 
@@ -30,7 +30,7 @@
           class="!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 shadow-md flex items-center gap-1 font-bold"
         >
           <el-icon><Check /></el-icon>
-          Lưu cấu hình
+          {{ $t('algorithm.save') }}
         </el-button>
       </div>
     </div>
@@ -44,7 +44,7 @@
           <span class="p-1 bg-teal-50 text-teal-600 rounded border border-teal-100 flex items-center justify-center">
             <el-icon><User /></el-icon>
           </span>
-          Nhóm tối ưu cho Giáo viên
+          {{ $t('algorithm.teacher_group') }}
         </h2>
         
         <div v-for="config in teacherConstraints" :key="config.id" class="premium-constraint-card">
@@ -69,14 +69,14 @@
             <!-- Bộ chỉnh trọng số xuất hiện khi bật -->
             <transition name="fade-slide">
               <div v-if="config.enabled" class="mt-4 pt-3 border-t border-gray-50 flex items-center gap-6">
-                <span class="text-xs font-semibold text-gray-500 w-24">Trọng số phạt:</span>
+                <span class="text-xs font-semibold text-gray-500 w-24">{{ $t('algorithm.penalty_weight') }}</span>
                 <el-slider 
                   v-model="config.weight" 
                   :min="1" 
                   :max="100" 
                   show-input 
                   class="flex-grow premium-slider"
-                  :marks="{ 10: 'Nhẹ', 50: 'Trung bình', 90: 'Nặng' }"
+                  :marks="{ 10: $t('algorithm.weight_light'), 50: $t('algorithm.weight_medium'), 90: $t('algorithm.weight_hard') }"
                 />
               </div>
             </transition>
@@ -90,7 +90,7 @@
           <span class="p-1 bg-emerald-50 text-emerald-600 rounded border border-emerald-100 flex items-center justify-center">
             <el-icon><School /></el-icon>
           </span>
-          Nhóm tối ưu cho Lớp học & Phòng học
+          {{ $t('algorithm.class_room_group') }}
         </h2>
         
         <div v-for="config in classConstraints" :key="config.id" class="premium-constraint-card">
@@ -115,14 +115,14 @@
             <!-- Bộ chỉnh trọng số xuất hiện khi bật -->
             <transition name="fade-slide">
               <div v-if="config.enabled" class="mt-4 pt-3 border-t border-gray-50 flex items-center gap-6">
-                <span class="text-xs font-semibold text-gray-500 w-24">Trọng số phạt:</span>
+                <span class="text-xs font-semibold text-gray-500 w-24">{{ $t('algorithm.penalty_weight') }}</span>
                 <el-slider 
                   v-model="config.weight" 
                   :min="1" 
                   :max="100" 
                   show-input 
                   class="flex-grow premium-slider"
-                  :marks="{ 10: 'Nhẹ', 50: 'Trung bình', 90: 'Nặng' }"
+                  :marks="{ 10: $t('algorithm.weight_light'), 50: $t('algorithm.weight_medium'), 90: $t('algorithm.weight_hard') }"
                 />
               </div>
             </transition>
@@ -139,6 +139,7 @@ import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import { Check, Refresh, User, School } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
 interface ConstraintConfig {
   id: number;
@@ -152,6 +153,7 @@ interface ConstraintConfig {
 const loading = ref(false);
 const saving = ref(false);
 const constraints = ref<ConstraintConfig[]>([]);
+const { t } = useI18n();
 
 // Tách nhóm ràng buộc
 const teacherKeys = [
@@ -180,7 +182,7 @@ const fetchConstraints = async () => {
       constraints.value = res.data;
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi tải danh sách cấu hình thuật toán');
+    ElMessage.error(t('algorithm.error_load'));
   } finally {
     loading.value = false;
   }
@@ -192,13 +194,13 @@ const saveConfigurations = async () => {
   try {
     const res: any = await api.put('/constraints', constraints.value);
     if (res.success) {
-      ElMessage.success('Lưu cấu hình thuật toán và cập nhật Solver thành công!');
+      ElMessage.success(t('algorithm.save_success'));
       fetchConstraints();
     } else {
-      ElMessage.error(res.message || 'Lưu cấu hình thất bại');
+      ElMessage.error(res.message || t('algorithm.save_failed'));
     }
   } catch (err: any) {
-    ElMessage.error(err.response?.data?.message || 'Có lỗi xảy ra khi lưu cấu hình');
+    ElMessage.error(err.response?.data?.message || t('algorithm.save_failed'));
   } finally {
     saving.value = false;
   }

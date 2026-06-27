@@ -6,7 +6,7 @@
         <span class="bg-gradient-to-b from-emerald-500 to-teal-600 w-2.5 h-8 rounded-full"></span>
         {{ $t('skill.title') }}
       </h1>
-      <p class="text-sm text-gray-500 mt-1">Quản lý danh mục kỹ năng chuyên môn dùng để phân công và tìm kiếm giáo viên phù hợp.</p>
+      <p class="text-sm text-gray-500 mt-1">{{ $t('skill.desc') }}</p>
     </div>
 
     <!-- Toolbar -->
@@ -62,12 +62,12 @@
         <el-table-column :label="$t('common.actions')" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex items-center gap-1">
-              <el-tooltip content="Xem chi tiết" placement="top">
+              <el-tooltip :content="$t('account.tooltip_detail')" placement="top">
                 <el-button type="info" link @click="openModal(row, true)" class="hover:!text-blue-600">
                   <el-icon :size="16"><View /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="Xóa kỹ năng" placement="top">
+              <el-tooltip :content="$t('skill.tooltip_delete')" placement="top">
                 <el-button type="danger" link @click="handleDelete(row.id)" class="hover:!text-red-600">
                   <el-icon :size="16"><Delete /></el-icon>
                 </el-button>
@@ -106,13 +106,13 @@
           <el-input
             v-model="form.skillCode"
             :disabled="!!form.id"
-            placeholder="VD: IELTS, TOEIC, SPEAKING..."
+            :placeholder="$t('skill.placeholder_code')"
           />
         </el-form-item>
         <el-form-item :label="$t('skill.name')" required>
           <el-input
             v-model="form.skillName"
-            placeholder="VD: IELTS 7.5+, TOEIC 900..."
+            :placeholder="$t('skill.placeholder_name')"
           />
         </el-form-item>
         <el-form-item :label="$t('skill.description')">
@@ -120,7 +120,7 @@
             v-model="form.description"
             type="textarea"
             :rows="5"
-            placeholder="Mô tả chi tiết về kỹ năng này..."
+            :placeholder="$t('skill.placeholder_desc')"
           />
         </el-form-item>
       </el-form>
@@ -229,7 +229,7 @@ const openModal = (skill?: any, viewOnly = false) => {
 /** Lưu thông tin kỹ năng mới hoặc cập nhật */
 const handleSave = async () => {
   if (!form.value.skillCode || !form.value.skillName) {
-    ElMessage.warning(t('common.required') || 'Vui lòng điền đầy đủ thông tin bắt buộc');
+    ElMessage.warning(t('common.required'));
     return;
   }
   saving.value = true;
@@ -256,17 +256,17 @@ const handleSave = async () => {
 const handleDelete = async (id: number) => {
   try {
     await ElMessageBox.confirm(
-      t('skill.delete_confirm') || 'Bạn có chắc chắn muốn xóa kỹ năng này?',
-      t('common.confirm') || 'Xác nhận xóa',
+      t('skill.delete_confirm'),
+      t('common.confirm'),
       {
         type: 'warning',
-        confirmButtonText: t('common.delete') || 'Xóa',
-        cancelButtonText: t('common.cancel') || 'Hủy'
+        confirmButtonText: t('common.delete'),
+        cancelButtonText: t('common.cancel')
       }
     );
     const res: any = await api.delete(`/skills/${id}`);
     if (res.success) {
-      ElMessage.success(res.message || 'Đã xóa kỹ năng thành công');
+      ElMessage.success(res.message || t('skill.success_delete'));
       fetchSkills();
     }
   } catch {
